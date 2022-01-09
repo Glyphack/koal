@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package auth.v1;
+
+option go_package = "github.com/glyphack/koal/gen/proto/go/auth/v1;authv1";
+
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+
+
+
+service AuthService {
+    // Register a new user
+    rpc Register (RegisterRequest) returns (RegisterResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/register"
+            body: "*"
+        };
+    }
+}
+
+message RegisterRequest {
+    string email = 1 [(google.api.field_behavior) = REQUIRED];
+    string password = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message RegisterResponse {
+    string token = 1;
+}
