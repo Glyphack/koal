@@ -7,13 +7,17 @@ import (
 	"net/http"
 
 	authv1 "github.com/glyphack/koal/gen/proto/go/auth/v1"
+	"github.com/glyphack/koal/internal/config"
 	authapi "github.com/glyphack/koal/internal/module/auth/api"
+	"github.com/glyphack/koal/pkg/corsutils"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 func main() {
+
+	config.InitConfig()
 	lis, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
@@ -21,8 +25,8 @@ func main() {
 
 	s := grpc.NewServer()
 
-	authapi.RegisterServer(s)
-	
+	authv1.RegisterAuthServiceServer(s, authapi.NewServer())
+
 	log.Println("Serving gRPC on 0.0.0.0:8080")
 	go func() {
 		log.Fatalln(s.Serve(lis))
@@ -48,7 +52,7 @@ func main() {
 
 	gwServer := &http.Server{
 		Addr:    ":8090",
-		Handler: gwmux,
+		Handler: corsutils.Cors(gwmux, corsutils.AllowOrigin),
 	}
 
 	log.Println("Serving gRPC-Gateway on http://0.0.0.0:8090")
