@@ -17,6 +17,12 @@ service AuthService {
             body: "*"
         };
     }
+    rpc Login (LoginRequest) returns (LoginResponse) {
+        option (google.api.http) = {
+            post: "/v1/auth/login"
+            body: "*"
+        };
+    }
 }
 
 message RegisterRequest {
@@ -25,5 +31,14 @@ message RegisterRequest {
 }
 
 message RegisterResponse {
+    string token = 1;
+}
+
+message LoginRequest {
+    string email = 1 [(google.api.field_behavior) = REQUIRED];
+    string password = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message LoginResponse {
     string token = 1;
 }
