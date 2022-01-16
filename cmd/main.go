@@ -6,6 +6,9 @@ import (
 	"net"
 	"net/http"
 
+	_ "github.com/mattn/go-sqlite3"
+
+	"github.com/glyphack/koal/ent"
 	authv1 "github.com/glyphack/koal/gen/proto/go/auth/v1"
 	"github.com/glyphack/koal/internal/config"
 	authapi "github.com/glyphack/koal/internal/module/auth/api"
@@ -24,8 +27,13 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-
-	authv1.RegisterAuthServiceServer(s, authapi.NewServer())
+	// TODO Replace Mock DB
+	client, err := ent.Open("sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+	authv1.RegisterAuthServiceServer(s, authapi.NewServer(client))
 
 	log.Println("Serving gRPC on 0.0.0.0:8080")
 	go func() {
@@ -44,7 +52,13 @@ func main() {
 		log.Fatalln("Failed to dial server:", err)
 	}
 
+	r := http.NewServeMux()
+
+	fs := http.FileServer(http.Dir("./api-docs/"))
+	r.Handle("/swaggerui/", http.StripPrefix("/swaggerui/", fs))
+
 	gwmux := runtime.NewServeMux()
+	r.Handle("/", corsutils.Cors(gwmux, corsutils.AllowOrigin))
 	err = authv1.RegisterAuthServiceHandler(context.Background(), gwmux, conn)
 	if err != nil {
 		log.Fatalln("Failed to register gateway:", err)
@@ -52,7 +66,7 @@ func main() {
 
 	gwServer := &http.Server{
 		Addr:    ":8090",
-		Handler: corsutils.Cors(gwmux, corsutils.AllowOrigin),
+		Handler: corsutils.Cors(r, corsutils.AllowOrigin),
 	}
 
 	log.Println("Serving gRPC-Gateway on http://0.0.0.0:8090")
