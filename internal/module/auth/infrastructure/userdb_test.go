@@ -80,7 +80,7 @@ func TestUpdateUser(t *testing.T) {
 	err = userRepo.UpdateUser(context.Background(), updatedUser)
 	assert.Nil(t, err)
 
-	err, user = userRepo.GetUser(context.Background(), user.Email)
+	user, err = userRepo.GetUser(context.Background(), user.Email)
 	assert.Nil(t, err)
 	assert.Equal(t, user.Password, newPassword)
 }

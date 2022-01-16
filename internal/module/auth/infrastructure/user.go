@@ -8,7 +8,7 @@ import (
 
 type UserRepository interface {
 	CreateUser(ctx context.Context, newUser *authuser.User) error
-	GetUser(ctx context.Context, id string) (error, *authuser.User)
+	GetUser(ctx context.Context, id string) (*authuser.User, error)
 	DeleteUser(ctx context.Context, id string) error
 	UpdateUser(ctx context.Context, newUser *authuser.User) (error)
 }

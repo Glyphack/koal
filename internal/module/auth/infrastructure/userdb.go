@@ -22,15 +22,15 @@ func (u *UserRepositoryDB) CreateUser(ctx context.Context, newUser *authuser.Use
 	return nil
 }
 
-func (u *UserRepositoryDB) GetUser(ctx context.Context, id string) (error, *authuser.User) {
+func (u *UserRepositoryDB) GetUser(ctx context.Context, id string) (*authuser.User, error) {
 	dbUser, err := u.Client.Query().Where(user.Email(id)).First(ctx)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
-	return nil, &authuser.User{
+	return &authuser.User{
 		Email:    dbUser.Email,
 		Password: dbUser.Password,
-	}
+	}, nil
 }
 func (u *UserRepositoryDB) DeleteUser(ctx context.Context, id string) error {
 	count, err := u.Client.Delete().Where(user.Email(id)).Exec(ctx)

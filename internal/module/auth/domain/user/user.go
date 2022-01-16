@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/glyphack/koal/pkg/email"
+	"github.com/glyphack/koal/pkg/passwordutils"
 	"github.com/golang-jwt/jwt"
 	"github.com/spf13/viper"
 )
@@ -29,8 +30,11 @@ func (u *User) SetPassword(password string) error {
 	if len(password) < 7 {
 		return PasswordIsNotValidError
 	}
-
-	u.Password = password
+	var err error
+	u.Password, err = passwordutils.HashPassword(password)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
