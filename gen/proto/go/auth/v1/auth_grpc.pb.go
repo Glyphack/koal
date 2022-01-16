@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type AuthServiceClient interface {
 	// Register a new user
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
+	// Login a user
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 }
 
@@ -59,6 +60,7 @@ func (c *authServiceClient) Login(ctx context.Context, in *LoginRequest, opts ..
 type AuthServiceServer interface {
 	// Register a new user
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
+	// Login a user
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 }
 

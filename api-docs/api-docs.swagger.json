@@ -18,6 +18,7 @@
   "paths": {
     "/v1/auth/login": {
       "post": {
+        "summary": "Login a user",
         "operationId": "AuthService_Login",
         "responses": {
           "200": {
