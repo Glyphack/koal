@@ -6,7 +6,8 @@ import (
 	"net"
 	"net/http"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
+	"github.com/spf13/viper"
 
 	"github.com/glyphack/koal/ent"
 	authv1 "github.com/glyphack/koal/gen/proto/go/auth/v1"
@@ -27,8 +28,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	// TODO Replace Mock DB
-	client, err := ent.Open("sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
+    client, err := ent.Open("postgres",viper.GetString("postgres_uri"))
 	if err != nil {
 		log.Fatal(err)
 	}
