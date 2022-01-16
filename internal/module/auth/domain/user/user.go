@@ -2,9 +2,15 @@ package authuser
 
 import (
 	"errors"
+	"time"
 
 	"github.com/glyphack/koal/pkg/email"
+	"github.com/golang-jwt/jwt"
+	"github.com/spf13/viper"
 )
+
+var PasswordIsNotValidError = errors.New("Password must at least be 7 characters long")
+var EmailIsNotValidError = errors.New("Email is not valid")
 
 type User struct {
 	Email    string
@@ -13,7 +19,7 @@ type User struct {
 
 func (u *User) SetEmailAddress(emailAddress string) error {
 	if !email.IsEmailValid(emailAddress) {
-		return errors.New("Email is not valid")
+		return EmailIsNotValidError
 	}
 	u.Email = emailAddress
 	return nil
@@ -21,9 +27,19 @@ func (u *User) SetEmailAddress(emailAddress string) error {
 
 func (u *User) SetPassword(password string) error {
 	if len(password) < 7 {
-		return errors.New("Password must at least be 7 characters long")
+		return PasswordIsNotValidError
 	}
 
 	u.Password = password
 	return nil
+}
+
+func (u *User) GenerateToken() (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": u.Email,
+		"nbf":     time.Now().UTC().Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(viper.GetString("jwt_secret")))
+	return tokenString, err
 }
