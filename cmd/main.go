@@ -55,7 +55,7 @@ func main() {
 	r := http.NewServeMux()
 
 	fs := http.FileServer(http.Dir("./api-docs/"))
-	r.Handle("/swaggerui/", http.StripPrefix("/swaggerui/", fs))
+	r.Handle("/api-docs/", http.StripPrefix("/api-docs/", fs))
 
 	gwmux := runtime.NewServeMux()
 	r.Handle("/", corsutils.Cors(gwmux, corsutils.AllowOrigin))
