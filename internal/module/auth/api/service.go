@@ -7,7 +7,6 @@ import (
 	authv1pb "github.com/glyphack/koal/gen/proto/go/auth/v1"
 	authuser "github.com/glyphack/koal/internal/module/auth/domain/user"
 	authinfra "github.com/glyphack/koal/internal/module/auth/infrastructure"
-	"github.com/glyphack/koal/pkg/passwordutils"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -43,7 +42,14 @@ func (s *server) Register(ctx context.Context, in *authv1pb.RegisterRequest) (*a
 
 func (s *server) Login(ctx context.Context, in *authv1pb.LoginRequest) (*authv1pb.LoginResponse, error) {
 	user, err := s.userRepository.GetUser(ctx, in.Email)
-	passwordCorrect := passwordutils.CheckPasswordHash(in.Password, user.Password)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, status.Error(codes.NotFound, "Incorrect email or password")
+		}
+		return nil, status.Error(codes.Unknown, "Unknown error")
+	}
+
+	passwordCorrect := user.CheckPassword(in.Password)
 	if passwordCorrect == false {
 		return nil, status.Error(codes.Unauthenticated, "Incorrect email or password")
 	}

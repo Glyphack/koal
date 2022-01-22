@@ -23,14 +23,16 @@ func TestSetInvalidEmail(t *testing.T) {
 }
 
 func TestSetPasswordValidPassword(t *testing.T) {
-	user := authuser.User{Email: "testEmail@test.com", Password: "OldPassword"}
+	user := authuser.User{Email: "testEmail@test.com"}
+	user.SetPassword("OldPassword")
 	newPassword := "strong_password"
 	_ = user.SetPassword(newPassword)
-	assert.Equal(t, user.Password, newPassword)
+	assert.True(t, user.CheckPassword(newPassword))
 }
 
 func TestSetPasswordInvalidPassword(t *testing.T) {
-	user := authuser.User{Email: "testEmail@test.com", Password: "OldPassword"}
+	user := authuser.User{Email: "testEmail@test.com"}
+	user.SetPassword("OldPassword")
 	newPassword := "pass"
 	err := user.SetPassword(newPassword)
 	assert.Equal(t, err, authuser.PasswordIsNotValidError)
@@ -38,8 +40,16 @@ func TestSetPasswordInvalidPassword(t *testing.T) {
 
 func TestGenerateToken(t *testing.T) {
 	viper.GetViper().Set("jwt_secret", "test")
-	user := authuser.User{Email: "testEmail@test.com", Password: "OldPassword"}
+	user := authuser.User{Email: "testEmail@test.com"}
+	user.SetPassword("OldPassword")
 	_, err := user.GenerateToken()
 	t.Log(viper.GetString("jwt_secret"))
 	assert.Nil(t, err)
+}
+
+
+func TestCheckPassword(t *testing.T) {
+	user := authuser.User{Email: "testEmail@test.com"}
+	user.SetPassword("password")
+	assert.True(t, user.CheckPassword("password"))
 }

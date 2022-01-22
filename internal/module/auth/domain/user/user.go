@@ -15,7 +15,7 @@ var EmailIsNotValidError = errors.New("Email is not valid")
 
 type User struct {
 	Email    string
-	Password string
+	Password string // Password is always a hash of real password
 }
 
 func (u *User) SetEmailAddress(emailAddress string) error {
@@ -36,6 +36,10 @@ func (u *User) SetPassword(password string) error {
 		return err
 	}
 	return nil
+}
+
+func (u *User) CheckPassword(inputPassword string) bool {
+	return passwordutils.CheckPasswordHash(inputPassword, u.Password)
 }
 
 func (u *User) GenerateToken() (string, error) {
