@@ -32,6 +32,7 @@ func (s *server) Register(ctx context.Context, in *authv1pb.RegisterRequest) (*a
 	if err != nil {
 		log.WithError(err).Error("Error while saving registered user")
 	}
+	log.Info("New user registered")
 
 	token, err := newUser.GenerateToken()
 
