@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/glyphack/koal/ent"
+	"github.com/glyphack/koal/ent/migrate"
 	authv1 "github.com/glyphack/koal/gen/proto/go/auth/v1"
 	"github.com/glyphack/koal/internal/config"
 	authapi "github.com/glyphack/koal/internal/module/auth/api"
@@ -28,10 +29,15 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-    client, err := ent.Open("postgres",viper.GetString("postgres_uri"))
+	client, err := ent.Open("postgres", viper.GetString("postgres_uri"))
 	if err != nil {
 		log.Fatal(err)
 	}
+	ctx := context.Background()
+	if err := client.Schema.Create(ctx, migrate.WithDropIndex(true), migrate.WithDropColumn(true)); err != nil {
+		log.Fatalf("failed creating schema resources: %v", err)
+	}
+
 	defer client.Close()
 	authv1.RegisterAuthServiceServer(s, authapi.NewServer(client))
 
@@ -43,7 +49,7 @@ func main() {
 	// Create a client connection to the gRPC server we just started
 	// This is where the gRPC-Gateway proxies the requests
 	conn, err := grpc.DialContext(
-		context.Background(),
+		ctx,
 		"0.0.0.0:8080",
 		grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
