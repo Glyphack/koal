@@ -28,7 +28,10 @@ func (s *server) Register(ctx context.Context, in *authv1pb.RegisterRequest) (*a
 	if err := newUser.SetPassword(in.GetPassword()); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	s.userRepository.CreateUser(ctx, &newUser)
+	err := s.userRepository.CreateUser(ctx, &newUser)
+	if err != nil {
+		log.WithError(err).Error("Error while saving registered user")
+	}
 
 	token, err := newUser.GenerateToken()
 
