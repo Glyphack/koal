@@ -46,6 +46,7 @@ func (s *server) Login(ctx context.Context, in *authv1pb.LoginRequest) (*authv1p
 		if ent.IsNotFound(err) {
 			return nil, status.Error(codes.NotFound, "Incorrect email or password")
 		}
+		log.WithError(err).Error("Error getting user from DB")
 		return nil, status.Error(codes.Unknown, "Unknown error")
 	}
 
