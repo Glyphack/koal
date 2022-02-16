@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package todo.v1;
+
+option go_package = "github.com/glyphack/koal/gen/proto/go/todo/v1;todov1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/api/field_behavior.proto";
+
+
+
+service TodoService {
+    // Returns all the Projects with their basic information
+    rpc GetProjects (google.protobuf.Empty) returns (GetProjectsResponse) {
+        option (google.api.http) = {
+            get: "/v1/todo/projects"
+        };
+    }
+    // Returns all the details for a project
+    rpc GetProjectDetails (GetProjectDetailsRequest) returns (GetProjectDetailsResponse) {
+        option (google.api.http) = {
+            get: "/v1/todo/projects/{id}"
+        };
+    }
+
+    rpc CreateProject (CreateProjectRequest) returns (CreateProjectResponse) {
+        option (google.api.http) = {
+            post: "/v1/todo/projects"
+            body: "*"
+        };
+    }
+
+    rpc EditProject (EditProjectRequest) returns (EditProjectResponse) {
+        option (google.api.http) = {
+            put: "/v1/todo/projects/{id}"
+            body: "*"
+        };
+    }
+
+    rpc DeleteProject (DeleteProjectRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/todo/projects/{id}"
+        };
+    }
+
+    rpc CreateTodoItem (CreateTodoItemRequest) returns (CreateTodoItemResponse) {
+        option (google.api.http) = {
+            post: "/v1/todo/item"
+            body: "*"
+        };
+    }
+}
+
+message TodoItem {
+    string id = 1;
+    string title = 2;
+    bool is_done = 3;
+}
+
+message Project {
+    string id = 1;
+    string name = 2;
+}
+
+message GetProjectsResponse {
+    repeated Project projects = 1;
+}
+
+message CreateProjectRequest {
+    string name = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message CreateProjectResponse {
+    Project created_project = 1;
+}
+
+message EditProjectRequest {
+    string id = 1 [(google.api.field_behavior) = REQUIRED];
+    Project updated_project = 2 [(google.api.field_behavior) = REQUIRED];
+}
+
+message EditProjectResponse {
+    Project updated_project = 1;
+}
+
+message GetProjectDetailsRequest {
+    string id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message DeleteProjectRequest {
+    string id = 1 [(google.api.field_behavior) = REQUIRED];
+}
+
+message GetProjectDetailsResponse {
+    Project info = 1;
+    repeated TodoItem items = 2;
+}
+
+message CreateTodoItemRequest {
+    oneof project {
+        string project_id = 1;
+        bool default_project = 2;
+    }
+    string title = 3 [(google.api.field_behavior) = REQUIRED];
+}
+
+message CreateTodoItemResponse {
+    TodoItem created_item = 1;
+}
