@@ -33,7 +33,7 @@ service TodoService {
 
     rpc EditProject (EditProjectRequest) returns (EditProjectResponse) {
         option (google.api.http) = {
-            put: "/v1/todo/projects/{id}"
+            put: "/v1/todo/projects/{project.id}"
             body: "*"
         };
     }
@@ -46,16 +46,38 @@ service TodoService {
 
     rpc CreateTodoItem (CreateTodoItemRequest) returns (CreateTodoItemResponse) {
         option (google.api.http) = {
-            post: "/v1/todo/item"
+            post: "/v1/todo/items"
             body: "*"
         };
     }
+
+    rpc DeleteTodoItem (DeleteTodoItemRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            delete: "/v1/todo/items/{id}"
+        };
+    }
+
+    rpc UpdateTodoItem (UpdateTodoItemRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            patch: "/v1/todo/items/{id}"
+            body: "*"
+        };
+    }
+
+    // returns all the undone items across all projects
+    rpc GetUndoneList (google.protobuf.Empty) returns (GetUndoneListResponse) {
+        option (google.api.http) = {
+            get: "/v1/todo/lists/undone"
+        };
+    }
+
 }
 
 message TodoItem {
     string id = 1;
     string title = 2;
     bool is_done = 3;
+    Project project = 4;
 }
 
 message Project {
@@ -76,8 +98,7 @@ message CreateProjectResponse {
 }
 
 message EditProjectRequest {
-    string id = 1 [(google.api.field_behavior) = REQUIRED];
-    Project updated_project = 2 [(google.api.field_behavior) = REQUIRED];
+    Project project = 1 [(google.api.field_behavior) = REQUIRED];
 }
 
 message EditProjectResponse {
@@ -107,4 +128,19 @@ message CreateTodoItemRequest {
 
 message CreateTodoItemResponse {
     TodoItem created_item = 1;
+}
+
+
+message GetUndoneListResponse {
+    repeated TodoItem items = 1;
+}
+
+message DeleteTodoItemRequest {
+    string id = 1;
+}
+
+message UpdateTodoItemRequest {
+    string id = 1;
+    string title = 2;
+    bool is_done = 3;
 }

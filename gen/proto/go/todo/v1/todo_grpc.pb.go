@@ -31,6 +31,10 @@ type TodoServiceClient interface {
 	EditProject(ctx context.Context, in *EditProjectRequest, opts ...grpc.CallOption) (*EditProjectResponse, error)
 	DeleteProject(ctx context.Context, in *DeleteProjectRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CreateTodoItem(ctx context.Context, in *CreateTodoItemRequest, opts ...grpc.CallOption) (*CreateTodoItemResponse, error)
+	DeleteTodoItem(ctx context.Context, in *DeleteTodoItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateTodoItem(ctx context.Context, in *UpdateTodoItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// returns all the undone items across all projects
+	GetUndoneList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetUndoneListResponse, error)
 }
 
 type todoServiceClient struct {
@@ -95,6 +99,33 @@ func (c *todoServiceClient) CreateTodoItem(ctx context.Context, in *CreateTodoIt
 	return out, nil
 }
 
+func (c *todoServiceClient) DeleteTodoItem(ctx context.Context, in *DeleteTodoItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/todo.v1.TodoService/DeleteTodoItem", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *todoServiceClient) UpdateTodoItem(ctx context.Context, in *UpdateTodoItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/todo.v1.TodoService/UpdateTodoItem", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *todoServiceClient) GetUndoneList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetUndoneListResponse, error) {
+	out := new(GetUndoneListResponse)
+	err := c.cc.Invoke(ctx, "/todo.v1.TodoService/GetUndoneList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TodoServiceServer is the server API for TodoService service.
 // All implementations should embed UnimplementedTodoServiceServer
 // for forward compatibility
@@ -107,6 +138,10 @@ type TodoServiceServer interface {
 	EditProject(context.Context, *EditProjectRequest) (*EditProjectResponse, error)
 	DeleteProject(context.Context, *DeleteProjectRequest) (*emptypb.Empty, error)
 	CreateTodoItem(context.Context, *CreateTodoItemRequest) (*CreateTodoItemResponse, error)
+	DeleteTodoItem(context.Context, *DeleteTodoItemRequest) (*emptypb.Empty, error)
+	UpdateTodoItem(context.Context, *UpdateTodoItemRequest) (*emptypb.Empty, error)
+	// returns all the undone items across all projects
+	GetUndoneList(context.Context, *emptypb.Empty) (*GetUndoneListResponse, error)
 }
 
 // UnimplementedTodoServiceServer should be embedded to have forward compatible implementations.
@@ -130,6 +165,15 @@ func (UnimplementedTodoServiceServer) DeleteProject(context.Context, *DeleteProj
 }
 func (UnimplementedTodoServiceServer) CreateTodoItem(context.Context, *CreateTodoItemRequest) (*CreateTodoItemResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTodoItem not implemented")
+}
+func (UnimplementedTodoServiceServer) DeleteTodoItem(context.Context, *DeleteTodoItemRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTodoItem not implemented")
+}
+func (UnimplementedTodoServiceServer) UpdateTodoItem(context.Context, *UpdateTodoItemRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTodoItem not implemented")
+}
+func (UnimplementedTodoServiceServer) GetUndoneList(context.Context, *emptypb.Empty) (*GetUndoneListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUndoneList not implemented")
 }
 
 // UnsafeTodoServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -251,6 +295,60 @@ func _TodoService_CreateTodoItem_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TodoService_DeleteTodoItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteTodoItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TodoServiceServer).DeleteTodoItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/todo.v1.TodoService/DeleteTodoItem",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TodoServiceServer).DeleteTodoItem(ctx, req.(*DeleteTodoItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TodoService_UpdateTodoItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTodoItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TodoServiceServer).UpdateTodoItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/todo.v1.TodoService/UpdateTodoItem",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TodoServiceServer).UpdateTodoItem(ctx, req.(*UpdateTodoItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TodoService_GetUndoneList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TodoServiceServer).GetUndoneList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/todo.v1.TodoService/GetUndoneList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TodoServiceServer).GetUndoneList(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TodoService_ServiceDesc is the grpc.ServiceDesc for TodoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -281,6 +379,18 @@ var TodoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateTodoItem",
 			Handler:    _TodoService_CreateTodoItem_Handler,
+		},
+		{
+			MethodName: "DeleteTodoItem",
+			Handler:    _TodoService_DeleteTodoItem_Handler,
+		},
+		{
+			MethodName: "UpdateTodoItem",
+			Handler:    _TodoService_UpdateTodoItem_Handler,
+		},
+		{
+			MethodName: "GetUndoneList",
+			Handler:    _TodoService_GetUndoneList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

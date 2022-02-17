@@ -85,7 +85,7 @@
         ]
       }
     },
-    "/v1/todo/item": {
+    "/v1/todo/items": {
       "post": {
         "operationId": "TodoService_CreateTodoItem",
         "responses": {
@@ -112,6 +112,103 @@
             }
           }
         ],
+        "tags": [
+          "TodoService"
+        ]
+      }
+    },
+    "/v1/todo/items/{id}": {
+      "delete": {
+        "operationId": "TodoService_DeleteTodoItem",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TodoService"
+        ]
+      },
+      "patch": {
+        "operationId": "TodoService_UpdateTodoItem",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "isDone": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "TodoService"
+        ]
+      }
+    },
+    "/v1/todo/lists/undone": {
+      "get": {
+        "summary": "returns all the undone items across all projects",
+        "operationId": "TodoService_GetUndoneList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUndoneListResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
         "tags": [
           "TodoService"
         ]
@@ -227,7 +324,9 @@
         "tags": [
           "TodoService"
         ]
-      },
+      }
+    },
+    "/v1/todo/projects/{project.id}": {
       "put": {
         "operationId": "TodoService_EditProject",
         "responses": {
@@ -246,7 +345,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "project.id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -256,12 +355,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "updatedProject": {
-                  "$ref": "#/definitions/v1Project"
-                }
-              }
+              "$ref": "#/definitions/v1EditProjectRequest"
             }
           }
         ],
@@ -349,6 +443,14 @@
         }
       }
     },
+    "v1EditProjectRequest": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "$ref": "#/definitions/v1Project"
+        }
+      }
+    },
     "v1EditProjectResponse": {
       "type": "object",
       "properties": {
@@ -378,6 +480,17 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/v1Project"
+          }
+        }
+      }
+    },
+    "v1GetUndoneListResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1TodoItem"
           }
         }
       }
@@ -462,6 +575,9 @@
         },
         "isDone": {
           "type": "boolean"
+        },
+        "project": {
+          "$ref": "#/definitions/v1Project"
         }
       }
     }

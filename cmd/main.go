@@ -6,9 +6,6 @@ import (
 	"net"
 	"net/http"
 
-	_ "github.com/lib/pq"
-	"github.com/spf13/viper"
-
 	"github.com/glyphack/koal/ent"
 	"github.com/glyphack/koal/ent/migrate"
 	authv1 "github.com/glyphack/koal/gen/proto/go/auth/v1"
@@ -16,6 +13,9 @@ import (
 	authapi "github.com/glyphack/koal/internal/module/auth/api"
 	"github.com/glyphack/koal/pkg/corsutils"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -29,15 +29,11 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	client, err := ent.Open("postgres", viper.GetString("postgres_uri"))
-	if err != nil {
-		log.Fatal(err)
-	}
+	client := newClient()
 	ctx := context.Background()
 	if err := client.Schema.Create(ctx, migrate.WithDropIndex(true), migrate.WithDropColumn(true), migrate.WithGlobalUniqueID(true)); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
-
 	defer client.Close()
 	authv1.RegisterAuthServiceServer(s, authapi.NewServer(client))
 
@@ -77,4 +73,21 @@ func main() {
 
 	log.Println("Serving gRPC-Gateway on http://0.0.0.0:8090")
 	log.Fatalln(gwServer.ListenAndServe())
+}
+
+func newClient() *ent.Client {
+	if viper.GetBool("debug") == true {
+		client, err := ent.Open("sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
+		if err != nil {
+			log.Fatal(err)
+		}
+		return client
+	} else {
+		client, err := ent.Open("postgres", viper.GetString("postgres_uri"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		return client
+	}
+
 }
