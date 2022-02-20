@@ -2,6 +2,13 @@ package main
 
 import (
 	"context"
+	todov1 "github.com/glyphack/koal/gen/proto/go/todo/v1"
+	todoapi "github.com/glyphack/koal/internal/module/todo/api"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	grpc_logrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
+	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
+	"github.com/sirupsen/logrus"
 	"log"
 	"net"
 	"net/http"
@@ -28,14 +35,20 @@ func main() {
 		log.Fatalln("Failed to listen:", err)
 	}
 
-	s := grpc.NewServer()
-	client := newClient()
 	ctx := context.Background()
+	s := grpc.NewServer(
+		grpc_middleware.WithUnaryServerChain(
+			grpc_auth.UnaryServerInterceptor(authapi.AuthFunc),
+			grpc_ctxtags.UnaryServerInterceptor(),
+			grpc_logrus.UnaryServerInterceptor(logrus.NewEntry(logrus.New()))),
+	)
+	client := newClient()
 	if err := client.Schema.Create(ctx, migrate.WithDropIndex(true), migrate.WithDropColumn(true), migrate.WithGlobalUniqueID(true)); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
 	defer client.Close()
 	authv1.RegisterAuthServiceServer(s, authapi.NewServer(client))
+	todov1.RegisterTodoServiceServer(s, todoapi.NewServer(client))
 
 	log.Println("Serving gRPC on 0.0.0.0:8080")
 	go func() {
@@ -63,7 +76,11 @@ func main() {
 	r.Handle("/", corsutils.Cors(gwmux, corsutils.AllowOrigin))
 	err = authv1.RegisterAuthServiceHandler(context.Background(), gwmux, conn)
 	if err != nil {
-		log.Fatalln("Failed to register gateway:", err)
+		log.Fatalln("Failed to register auth service", err)
+	}
+	err = todov1.RegisterTodoServiceHandler(ctx, gwmux, conn)
+	if err != nil {
+		log.Fatalln("Failed to register todo service", err)
 	}
 
 	gwServer := &http.Server{

@@ -9,10 +9,13 @@ import (
 
 	"github.com/glyphack/koal/ent/migrate"
 
+	"github.com/glyphack/koal/ent/project"
+	"github.com/glyphack/koal/ent/todoitem"
 	"github.com/glyphack/koal/ent/user"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -20,6 +23,10 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// Project is the client for interacting with the Project builders.
+	Project *ProjectClient
+	// TodoItem is the client for interacting with the TodoItem builders.
+	TodoItem *TodoItemClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -35,6 +42,8 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.Project = NewProjectClient(c.config)
+	c.TodoItem = NewTodoItemClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -67,9 +76,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		User:   NewUserClient(cfg),
+		ctx:      ctx,
+		config:   cfg,
+		Project:  NewProjectClient(cfg),
+		TodoItem: NewTodoItemClient(cfg),
+		User:     NewUserClient(cfg),
 	}, nil
 }
 
@@ -87,15 +98,17 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		config: cfg,
-		User:   NewUserClient(cfg),
+		config:   cfg,
+		Project:  NewProjectClient(cfg),
+		TodoItem: NewTodoItemClient(cfg),
+		User:     NewUserClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		User.
+//		Project.
 //		Query().
 //		Count(ctx)
 //
@@ -118,7 +131,221 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.Project.Use(hooks...)
+	c.TodoItem.Use(hooks...)
 	c.User.Use(hooks...)
+}
+
+// ProjectClient is a client for the Project schema.
+type ProjectClient struct {
+	config
+}
+
+// NewProjectClient returns a client for the Project from the given config.
+func NewProjectClient(c config) *ProjectClient {
+	return &ProjectClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `project.Hooks(f(g(h())))`.
+func (c *ProjectClient) Use(hooks ...Hook) {
+	c.hooks.Project = append(c.hooks.Project, hooks...)
+}
+
+// Create returns a create builder for Project.
+func (c *ProjectClient) Create() *ProjectCreate {
+	mutation := newProjectMutation(c.config, OpCreate)
+	return &ProjectCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Project entities.
+func (c *ProjectClient) CreateBulk(builders ...*ProjectCreate) *ProjectCreateBulk {
+	return &ProjectCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Project.
+func (c *ProjectClient) Update() *ProjectUpdate {
+	mutation := newProjectMutation(c.config, OpUpdate)
+	return &ProjectUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProjectClient) UpdateOne(pr *Project) *ProjectUpdateOne {
+	mutation := newProjectMutation(c.config, OpUpdateOne, withProject(pr))
+	return &ProjectUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProjectClient) UpdateOneID(id int) *ProjectUpdateOne {
+	mutation := newProjectMutation(c.config, OpUpdateOne, withProjectID(id))
+	return &ProjectUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Project.
+func (c *ProjectClient) Delete() *ProjectDelete {
+	mutation := newProjectMutation(c.config, OpDelete)
+	return &ProjectDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *ProjectClient) DeleteOne(pr *Project) *ProjectDeleteOne {
+	return c.DeleteOneID(pr.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *ProjectClient) DeleteOneID(id int) *ProjectDeleteOne {
+	builder := c.Delete().Where(project.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProjectDeleteOne{builder}
+}
+
+// Query returns a query builder for Project.
+func (c *ProjectClient) Query() *ProjectQuery {
+	return &ProjectQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Project entity by its id.
+func (c *ProjectClient) Get(ctx context.Context, id int) (*Project, error) {
+	return c.Query().Where(project.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProjectClient) GetX(ctx context.Context, id int) *Project {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryItems queries the items edge of a Project.
+func (c *ProjectClient) QueryItems(pr *Project) *TodoItemQuery {
+	query := &TodoItemQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(project.Table, project.FieldID, id),
+			sqlgraph.To(todoitem.Table, todoitem.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, project.ItemsTable, project.ItemsColumn),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ProjectClient) Hooks() []Hook {
+	return c.hooks.Project
+}
+
+// TodoItemClient is a client for the TodoItem schema.
+type TodoItemClient struct {
+	config
+}
+
+// NewTodoItemClient returns a client for the TodoItem from the given config.
+func NewTodoItemClient(c config) *TodoItemClient {
+	return &TodoItemClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `todoitem.Hooks(f(g(h())))`.
+func (c *TodoItemClient) Use(hooks ...Hook) {
+	c.hooks.TodoItem = append(c.hooks.TodoItem, hooks...)
+}
+
+// Create returns a create builder for TodoItem.
+func (c *TodoItemClient) Create() *TodoItemCreate {
+	mutation := newTodoItemMutation(c.config, OpCreate)
+	return &TodoItemCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of TodoItem entities.
+func (c *TodoItemClient) CreateBulk(builders ...*TodoItemCreate) *TodoItemCreateBulk {
+	return &TodoItemCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for TodoItem.
+func (c *TodoItemClient) Update() *TodoItemUpdate {
+	mutation := newTodoItemMutation(c.config, OpUpdate)
+	return &TodoItemUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TodoItemClient) UpdateOne(ti *TodoItem) *TodoItemUpdateOne {
+	mutation := newTodoItemMutation(c.config, OpUpdateOne, withTodoItem(ti))
+	return &TodoItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TodoItemClient) UpdateOneID(id int) *TodoItemUpdateOne {
+	mutation := newTodoItemMutation(c.config, OpUpdateOne, withTodoItemID(id))
+	return &TodoItemUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for TodoItem.
+func (c *TodoItemClient) Delete() *TodoItemDelete {
+	mutation := newTodoItemMutation(c.config, OpDelete)
+	return &TodoItemDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *TodoItemClient) DeleteOne(ti *TodoItem) *TodoItemDeleteOne {
+	return c.DeleteOneID(ti.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *TodoItemClient) DeleteOneID(id int) *TodoItemDeleteOne {
+	builder := c.Delete().Where(todoitem.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TodoItemDeleteOne{builder}
+}
+
+// Query returns a query builder for TodoItem.
+func (c *TodoItemClient) Query() *TodoItemQuery {
+	return &TodoItemQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a TodoItem entity by its id.
+func (c *TodoItemClient) Get(ctx context.Context, id int) (*TodoItem, error) {
+	return c.Query().Where(todoitem.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TodoItemClient) GetX(ctx context.Context, id int) *TodoItem {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryProject queries the project edge of a TodoItem.
+func (c *TodoItemClient) QueryProject(ti *TodoItem) *ProjectQuery {
+	query := &ProjectQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := ti.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(todoitem.Table, todoitem.FieldID, id),
+			sqlgraph.To(project.Table, project.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, todoitem.ProjectTable, todoitem.ProjectColumn),
+		)
+		fromV = sqlgraph.Neighbors(ti.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TodoItemClient) Hooks() []Hook {
+	return c.hooks.TodoItem
 }
 
 // UserClient is a client for the User schema.

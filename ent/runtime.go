@@ -2,8 +2,48 @@
 
 package ent
 
+import (
+	"time"
+
+	"github.com/glyphack/koal/ent/project"
+	"github.com/glyphack/koal/ent/schema"
+	"github.com/glyphack/koal/ent/todoitem"
+	"github.com/glyphack/koal/ent/user"
+	"github.com/google/uuid"
+)
+
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	projectFields := schema.Project{}.Fields()
+	_ = projectFields
+	// projectDescCreatedAt is the schema descriptor for created_at field.
+	projectDescCreatedAt := projectFields[1].Descriptor()
+	// project.DefaultCreatedAt holds the default value on creation for the created_at field.
+	project.DefaultCreatedAt = projectDescCreatedAt.Default.(func() time.Time)
+	// projectDescUUID is the schema descriptor for uuid field.
+	projectDescUUID := projectFields[2].Descriptor()
+	// project.DefaultUUID holds the default value on creation for the uuid field.
+	project.DefaultUUID = projectDescUUID.Default.(func() uuid.UUID)
+	todoitemFields := schema.TodoItem{}.Fields()
+	_ = todoitemFields
+	// todoitemDescCreatedAt is the schema descriptor for created_at field.
+	todoitemDescCreatedAt := todoitemFields[1].Descriptor()
+	// todoitem.DefaultCreatedAt holds the default value on creation for the created_at field.
+	todoitem.DefaultCreatedAt = todoitemDescCreatedAt.Default.(func() time.Time)
+	// todoitemDescUUID is the schema descriptor for uuid field.
+	todoitemDescUUID := todoitemFields[2].Descriptor()
+	// todoitem.DefaultUUID holds the default value on creation for the uuid field.
+	todoitem.DefaultUUID = todoitemDescUUID.Default.(func() uuid.UUID)
+	userFields := schema.User{}.Fields()
+	_ = userFields
+	// userDescCreatedAt is the schema descriptor for created_at field.
+	userDescCreatedAt := userFields[2].Descriptor()
+	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
+	user.DefaultCreatedAt = userDescCreatedAt.Default.(func() time.Time)
+	// userDescUUID is the schema descriptor for uuid field.
+	userDescUUID := userFields[3].Descriptor()
+	// user.DefaultUUID holds the default value on creation for the uuid field.
+	user.DefaultUUID = userDescUUID.Default.(func() uuid.UUID)
 }

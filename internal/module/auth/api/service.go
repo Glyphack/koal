@@ -2,7 +2,6 @@ package authapi
 
 import (
 	"context"
-
 	"github.com/glyphack/koal/ent"
 	authv1pb "github.com/glyphack/koal/gen/proto/go/auth/v1"
 	authuser "github.com/glyphack/koal/internal/module/auth/domain/user"
@@ -66,4 +65,8 @@ func (s *server) Login(ctx context.Context, in *authv1pb.LoginRequest) (*authv1p
 	}
 
 	return &authv1pb.LoginResponse{Token: token}, nil
+}
+
+func (s *server) AuthFuncOverride(ctx context.Context, fullMethodName string) (context.Context, error) {
+	return ctx, nil
 }

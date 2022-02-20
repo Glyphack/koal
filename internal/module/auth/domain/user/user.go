@@ -2,12 +2,11 @@ package authuser
 
 import (
 	"errors"
-	"time"
-
 	"github.com/glyphack/koal/pkg/email"
 	"github.com/glyphack/koal/pkg/passwordutils"
 	"github.com/golang-jwt/jwt"
 	"github.com/spf13/viper"
+	"time"
 )
 
 var PasswordIsNotValidError = errors.New("Password must at least be 7 characters long")
@@ -41,11 +40,10 @@ func (u *User) SetPassword(password string) error {
 func (u *User) CheckPassword(inputPassword string) bool {
 	return passwordutils.CheckPasswordHash(inputPassword, u.Password)
 }
-
 func (u *User) GenerateToken() (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": u.Email,
-		"nbf":     time.Now().UTC().Unix(),
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
+		Subject:   u.Email,
+		NotBefore: time.Now().UTC().Unix(),
 	})
 
 	tokenString, err := token.SignedString([]byte(viper.GetString("jwt_secret")))
