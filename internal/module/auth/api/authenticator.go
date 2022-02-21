@@ -12,8 +12,10 @@ import (
 
 func parseToken(tokenString string) (*jwt.StandardClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Don't forget to validate the alg is what you expect:
-		return viper.GetString("jwt_secret"), nil
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(viper.GetString("jwt_secret")), nil
 	})
 
 	if err != nil {
