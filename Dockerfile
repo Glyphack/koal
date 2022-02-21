@@ -1,6 +1,6 @@
 FROM golang:1.17-alpine
 
-RUN apk add --no-cache git
+RUN apk add --no-cache git make build-base
 
 WORKDIR /app/koal
 
