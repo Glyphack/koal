@@ -53,7 +53,7 @@ func TestServer_CreateTodoItem(t *testing.T) {
 	ctx := testutils.GetAuthenticatedContext(context.Background(), ownerId)
 	project := dependencies.Client.Project.Create().SetOwnerID(ownerId).SetName("testProj1").SaveX(ctx)
 	response, err := server.CreateTodoItem(ctx, &todov1.CreateTodoItemRequest{
-		Project: &todov1.CreateTodoItemRequest_ProjectId{ProjectId: project.UUId.String()},
+		Project: &todov1.CreateTodoItemRequest_ProjectId{ProjectId: project.UUID.String()},
 		Title:   "new task",
 	})
 	assert.Nil(t, err)
