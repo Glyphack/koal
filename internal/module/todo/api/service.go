@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"github.com/glyphack/koal/ent"
 	todov1 "github.com/glyphack/koal/gen/proto/go/todo/v1"
+	todoitem "github.com/glyphack/koal/internal/module/todo/domain/todo"
 	todoinfra "github.com/glyphack/koal/internal/module/todo/infrastructure"
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -16,7 +18,7 @@ type server struct {
 }
 
 func (s server) GetProjects(ctx context.Context, empty *emptypb.Empty) (*todov1.GetProjectsResponse, error) {
-	projects, err := s.itemRepository.AllProjects(ctx, fmt.Sprint(ctx.Value("userId")))
+	projects, err := s.itemRepository.GetAllMemberProjects(ctx, fmt.Sprint(ctx.Value("userId")))
 	if err != nil {
 		return nil, status.Error(codes.Internal, "Cannot load user projects")
 	}
@@ -55,8 +57,35 @@ func (s server) DeleteProject(ctx context.Context, request *todov1.DeleteProject
 }
 
 func (s server) CreateTodoItem(ctx context.Context, request *todov1.CreateTodoItemRequest) (*todov1.CreateTodoItemResponse, error) {
-	//TODO implement me
-	panic("implement me")
+	if request.GetProjectId() == "" {
+		return nil, status.Error(codes.InvalidArgument, "Project must be specified")
+	}
+
+	projectId, err := uuid.Parse(request.GetProjectId())
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "ProjectId is invalid")
+	}
+	todoItem := todoitem.Item{
+		UUId:    uuid.New(),
+		Title:   request.Title,
+		OwnerId: fmt.Sprint(ctx.Value("userId")),
+		Project: &todoitem.Project{UUId: projectId},
+	}
+	err = s.itemRepository.CreateItem(ctx, &todoItem)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "Cannot create todo item")
+	}
+	// TODO return project name
+	return &todov1.CreateTodoItemResponse{
+		CreatedItem: &todov1.TodoItem{
+			Id:     todoItem.UUId.String(),
+			Title:  todoItem.Title,
+			IsDone: false,
+			Project: &todov1.Project{
+				Id: todoItem.Project.UUId.String(),
+			},
+		},
+	}, nil
 }
 
 func (s server) DeleteTodoItem(ctx context.Context, request *todov1.DeleteTodoItemRequest) (*emptypb.Empty, error) {

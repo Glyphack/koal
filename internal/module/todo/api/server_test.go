@@ -2,6 +2,7 @@ package todoapi_test
 
 import (
 	"context"
+	todov1 "github.com/glyphack/koal/gen/proto/go/todo/v1"
 	todoapi "github.com/glyphack/koal/internal/module/todo/api"
 	"github.com/glyphack/koal/pkg/testutils"
 	"github.com/stretchr/testify/assert"
@@ -43,4 +44,18 @@ func TestGetUserProjectsWithMultipleProjects(t *testing.T) {
 	response, err := server.GetProjects(ctx, &emptypb.Empty{})
 	assert.Nil(t, err)
 	assert.Equal(t, len(response.Projects), 2)
+}
+
+func TestServer_CreateTodoItem(t *testing.T) {
+	dependencies := beforeEach(t)
+	server := todoapi.NewServer(dependencies.Client)
+	ownerId := "Sh"
+	ctx := testutils.GetAuthenticatedContext(context.Background(), ownerId)
+	project := dependencies.Client.Project.Create().SetOwnerID(ownerId).SetName("testProj1").SaveX(ctx)
+	response, err := server.CreateTodoItem(ctx, &todov1.CreateTodoItemRequest{
+		Project: &todov1.CreateTodoItemRequest_ProjectId{ProjectId: project.UUId.String()},
+		Title:   "new task",
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, dependencies.Client.TodoItem.Query().FirstX(ctx).Title, response.GetCreatedItem().GetTitle())
 }
