@@ -37,7 +37,7 @@ func (i ItemDB) GetAllMemberProjects(ctx context.Context, OwnerId string) ([]*to
 		projects = append(projects, &todoitem.Project{
 			Name:    dbProject.Name,
 			OwnerId: dbProject.OwnerID,
-			UUId:    dbProject.UUId,
+			UUId:    dbProject.UUID,
 		})
 	}
 	return projects, nil
