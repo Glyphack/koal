@@ -20,6 +20,8 @@ type TodoItem struct {
 	ID int `json:"id,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
+	// IsDone holds the value of the "is_done" field.
+	IsDone bool `json:"is_done,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UUID holds the value of the "uuid" field.
@@ -60,6 +62,8 @@ func (*TodoItem) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case todoitem.FieldIsDone:
+			values[i] = new(sql.NullBool)
 		case todoitem.FieldID:
 			values[i] = new(sql.NullInt64)
 		case todoitem.FieldTitle, todoitem.FieldOwnerID:
@@ -96,6 +100,12 @@ func (ti *TodoItem) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field title", values[i])
 			} else if value.Valid {
 				ti.Title = value.String
+			}
+		case todoitem.FieldIsDone:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_done", values[i])
+			} else if value.Valid {
+				ti.IsDone = value.Bool
 			}
 		case todoitem.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -157,6 +167,8 @@ func (ti *TodoItem) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v", ti.ID))
 	builder.WriteString(", title=")
 	builder.WriteString(ti.Title)
+	builder.WriteString(", is_done=")
+	builder.WriteString(fmt.Sprintf("%v", ti.IsDone))
 	builder.WriteString(", created_at=")
 	builder.WriteString(ti.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", uuid=")

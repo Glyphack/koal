@@ -26,6 +26,7 @@ var (
 	TodoItemsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "title", Type: field.TypeString},
+		{Name: "is_done", Type: field.TypeBool, Default: false},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "uuid", Type: field.TypeUUID},
 		{Name: "owner_id", Type: field.TypeString},
@@ -39,7 +40,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "todo_items_projects_items",
-				Columns:    []*schema.Column{TodoItemsColumns[5]},
+				Columns:    []*schema.Column{TodoItemsColumns[6]},
 				RefColumns: []*schema.Column{ProjectsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

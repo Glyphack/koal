@@ -585,6 +585,7 @@ type TodoItemMutation struct {
 	typ            string
 	id             *int
 	title          *string
+	is_done        *bool
 	created_at     *time.Time
 	uuid           *uuid.UUID
 	owner_id       *string
@@ -709,6 +710,42 @@ func (m *TodoItemMutation) OldTitle(ctx context.Context) (v string, err error) {
 // ResetTitle resets all changes to the "title" field.
 func (m *TodoItemMutation) ResetTitle() {
 	m.title = nil
+}
+
+// SetIsDone sets the "is_done" field.
+func (m *TodoItemMutation) SetIsDone(b bool) {
+	m.is_done = &b
+}
+
+// IsDone returns the value of the "is_done" field in the mutation.
+func (m *TodoItemMutation) IsDone() (r bool, exists bool) {
+	v := m.is_done
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsDone returns the old "is_done" field's value of the TodoItem entity.
+// If the TodoItem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TodoItemMutation) OldIsDone(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldIsDone is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldIsDone requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsDone: %w", err)
+	}
+	return oldValue.IsDone, nil
+}
+
+// ResetIsDone resets all changes to the "is_done" field.
+func (m *TodoItemMutation) ResetIsDone() {
+	m.is_done = nil
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -877,9 +914,12 @@ func (m *TodoItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TodoItemMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.title != nil {
 		fields = append(fields, todoitem.FieldTitle)
+	}
+	if m.is_done != nil {
+		fields = append(fields, todoitem.FieldIsDone)
 	}
 	if m.created_at != nil {
 		fields = append(fields, todoitem.FieldCreatedAt)
@@ -900,6 +940,8 @@ func (m *TodoItemMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case todoitem.FieldTitle:
 		return m.Title()
+	case todoitem.FieldIsDone:
+		return m.IsDone()
 	case todoitem.FieldCreatedAt:
 		return m.CreatedAt()
 	case todoitem.FieldUUID:
@@ -917,6 +959,8 @@ func (m *TodoItemMutation) OldField(ctx context.Context, name string) (ent.Value
 	switch name {
 	case todoitem.FieldTitle:
 		return m.OldTitle(ctx)
+	case todoitem.FieldIsDone:
+		return m.OldIsDone(ctx)
 	case todoitem.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case todoitem.FieldUUID:
@@ -938,6 +982,13 @@ func (m *TodoItemMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTitle(v)
+		return nil
+	case todoitem.FieldIsDone:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsDone(v)
 		return nil
 	case todoitem.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -1011,6 +1062,9 @@ func (m *TodoItemMutation) ResetField(name string) error {
 	switch name {
 	case todoitem.FieldTitle:
 		m.ResetTitle()
+		return nil
+	case todoitem.FieldIsDone:
+		m.ResetIsDone()
 		return nil
 	case todoitem.FieldCreatedAt:
 		m.ResetCreatedAt()

@@ -101,6 +101,13 @@ func Title(v string) predicate.TodoItem {
 	})
 }
 
+// IsDone applies equality check predicate on the "is_done" field. It's identical to IsDoneEQ.
+func IsDone(v bool) predicate.TodoItem {
+	return predicate.TodoItem(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldIsDone), v))
+	})
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.TodoItem {
 	return predicate.TodoItem(func(s *sql.Selector) {
@@ -230,6 +237,20 @@ func TitleEqualFold(v string) predicate.TodoItem {
 func TitleContainsFold(v string) predicate.TodoItem {
 	return predicate.TodoItem(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldTitle), v))
+	})
+}
+
+// IsDoneEQ applies the EQ predicate on the "is_done" field.
+func IsDoneEQ(v bool) predicate.TodoItem {
+	return predicate.TodoItem(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldIsDone), v))
+	})
+}
+
+// IsDoneNEQ applies the NEQ predicate on the "is_done" field.
+func IsDoneNEQ(v bool) predicate.TodoItem {
+	return predicate.TodoItem(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldIsDone), v))
 	})
 }
 

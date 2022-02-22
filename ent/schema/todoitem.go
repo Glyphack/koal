@@ -18,6 +18,7 @@ type TodoItem struct {
 func (TodoItem) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("title"),
+		field.Bool("is_done").Default(false),
 		field.Time("created_at").
 			Default(time.Now),
 		field.UUID("uuid", uuid.UUID{}).

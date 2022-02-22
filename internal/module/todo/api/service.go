@@ -99,8 +99,24 @@ func (s server) UpdateTodoItem(ctx context.Context, request *todov1.UpdateTodoIt
 }
 
 func (s server) GetUndoneList(ctx context.Context, empty *emptypb.Empty) (*todov1.GetUndoneListResponse, error) {
-	//TODO implement me
-	panic("implement me")
+	ownerId := fmt.Sprint(ctx.Value("userId"))
+	items, err := s.itemRepository.AllUndoneItems(ctx, ownerId)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "Cannot retrieve items")
+	}
+	var undoneItems []*todov1.TodoItem
+	for _, item := range items {
+		undoneItems = append(undoneItems, &todov1.TodoItem{
+			Id:     item.UUId.String(),
+			Title:  item.Title,
+			IsDone: false,
+			Project: &todov1.Project{
+				Id:   item.Project.UUId.String(),
+				Name: item.Project.Name,
+			},
+		})
+	}
+	return &todov1.GetUndoneListResponse{Items: undoneItems}, nil
 }
 
 func NewServer(dbConnection *ent.Client) *server {

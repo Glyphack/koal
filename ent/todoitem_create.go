@@ -28,6 +28,20 @@ func (tic *TodoItemCreate) SetTitle(s string) *TodoItemCreate {
 	return tic
 }
 
+// SetIsDone sets the "is_done" field.
+func (tic *TodoItemCreate) SetIsDone(b bool) *TodoItemCreate {
+	tic.mutation.SetIsDone(b)
+	return tic
+}
+
+// SetNillableIsDone sets the "is_done" field if the given value is not nil.
+func (tic *TodoItemCreate) SetNillableIsDone(b *bool) *TodoItemCreate {
+	if b != nil {
+		tic.SetIsDone(*b)
+	}
+	return tic
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (tic *TodoItemCreate) SetCreatedAt(t time.Time) *TodoItemCreate {
 	tic.mutation.SetCreatedAt(t)
@@ -144,6 +158,10 @@ func (tic *TodoItemCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (tic *TodoItemCreate) defaults() {
+	if _, ok := tic.mutation.IsDone(); !ok {
+		v := todoitem.DefaultIsDone
+		tic.mutation.SetIsDone(v)
+	}
 	if _, ok := tic.mutation.CreatedAt(); !ok {
 		v := todoitem.DefaultCreatedAt()
 		tic.mutation.SetCreatedAt(v)
@@ -158,6 +176,9 @@ func (tic *TodoItemCreate) defaults() {
 func (tic *TodoItemCreate) check() error {
 	if _, ok := tic.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "title"`)}
+	}
+	if _, ok := tic.mutation.IsDone(); !ok {
+		return &ValidationError{Name: "is_done", err: errors.New(`ent: missing required field "is_done"`)}
 	}
 	if _, ok := tic.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
@@ -202,6 +223,14 @@ func (tic *TodoItemCreate) createSpec() (*TodoItem, *sqlgraph.CreateSpec) {
 			Column: todoitem.FieldTitle,
 		})
 		_node.Title = value
+	}
+	if value, ok := tic.mutation.IsDone(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: todoitem.FieldIsDone,
+		})
+		_node.IsDone = value
 	}
 	if value, ok := tic.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

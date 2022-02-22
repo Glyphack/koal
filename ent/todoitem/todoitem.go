@@ -15,6 +15,8 @@ const (
 	FieldID = "id"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
+	// FieldIsDone holds the string denoting the is_done field in the database.
+	FieldIsDone = "is_done"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUUID holds the string denoting the uuid field in the database.
@@ -38,6 +40,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldTitle,
+	FieldIsDone,
 	FieldCreatedAt,
 	FieldUUID,
 	FieldOwnerID,
@@ -65,6 +68,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultIsDone holds the default value on creation for the "is_done" field.
+	DefaultIsDone bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUUID holds the default value on creation for the "uuid" field.

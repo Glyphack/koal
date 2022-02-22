@@ -1,4 +1,4 @@
-package todoitem
+package tododomain
 
 import "github.com/google/uuid"
 

@@ -35,6 +35,20 @@ func (tiu *TodoItemUpdate) SetTitle(s string) *TodoItemUpdate {
 	return tiu
 }
 
+// SetIsDone sets the "is_done" field.
+func (tiu *TodoItemUpdate) SetIsDone(b bool) *TodoItemUpdate {
+	tiu.mutation.SetIsDone(b)
+	return tiu
+}
+
+// SetNillableIsDone sets the "is_done" field if the given value is not nil.
+func (tiu *TodoItemUpdate) SetNillableIsDone(b *bool) *TodoItemUpdate {
+	if b != nil {
+		tiu.SetIsDone(*b)
+	}
+	return tiu
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (tiu *TodoItemUpdate) SetCreatedAt(t time.Time) *TodoItemUpdate {
 	tiu.mutation.SetCreatedAt(t)
@@ -170,6 +184,13 @@ func (tiu *TodoItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: todoitem.FieldTitle,
 		})
 	}
+	if value, ok := tiu.mutation.IsDone(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: todoitem.FieldIsDone,
+		})
+	}
 	if value, ok := tiu.mutation.CreatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -248,6 +269,20 @@ type TodoItemUpdateOne struct {
 // SetTitle sets the "title" field.
 func (tiuo *TodoItemUpdateOne) SetTitle(s string) *TodoItemUpdateOne {
 	tiuo.mutation.SetTitle(s)
+	return tiuo
+}
+
+// SetIsDone sets the "is_done" field.
+func (tiuo *TodoItemUpdateOne) SetIsDone(b bool) *TodoItemUpdateOne {
+	tiuo.mutation.SetIsDone(b)
+	return tiuo
+}
+
+// SetNillableIsDone sets the "is_done" field if the given value is not nil.
+func (tiuo *TodoItemUpdateOne) SetNillableIsDone(b *bool) *TodoItemUpdateOne {
+	if b != nil {
+		tiuo.SetIsDone(*b)
+	}
 	return tiuo
 }
 
@@ -408,6 +443,13 @@ func (tiuo *TodoItemUpdateOne) sqlSave(ctx context.Context) (_node *TodoItem, er
 			Type:   field.TypeString,
 			Value:  value,
 			Column: todoitem.FieldTitle,
+		})
+	}
+	if value, ok := tiuo.mutation.IsDone(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: todoitem.FieldIsDone,
 		})
 	}
 	if value, ok := tiuo.mutation.CreatedAt(); ok {

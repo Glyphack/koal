@@ -4,7 +4,8 @@ import (
 	"context"
 	"github.com/glyphack/koal/ent"
 	"github.com/glyphack/koal/ent/project"
-	todoitem "github.com/glyphack/koal/internal/module/todo/domain/todo"
+	"github.com/glyphack/koal/ent/todoitem"
+	"github.com/glyphack/koal/internal/module/todo/domain/todo"
 )
 
 type ItemDB struct {
@@ -12,9 +13,37 @@ type ItemDB struct {
 	ItemClient    *ent.TodoItemClient
 }
 
-func (i ItemDB) AllItems(ctx context.Context, OwnerId string) ([]*todoitem.Project, error) {
+func (i ItemDB) AllItems(ctx context.Context, OwnerId string) ([]*tododomain.Item, error) {
 	//TODO implement me
 	panic("implement me")
+}
+
+func (i ItemDB) AllUndoneItems(ctx context.Context, ownerId string) ([]*tododomain.Item, error) {
+	dbUndoneItems, err := i.ItemClient.Query().Where(
+		todoitem.OwnerID(ownerId),
+		todoitem.IsDone(false),
+	).All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var items []*tododomain.Item
+	for _, dbItem := range dbUndoneItems {
+		itemProject, err := dbItem.QueryProject().First(ctx)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, &tododomain.Item{
+			Title:   dbItem.Title,
+			OwnerId: dbItem.OwnerID,
+			UUId:    dbItem.UUID,
+			Project: &tododomain.Project{
+				UUId:    itemProject.UUID,
+				Name:    itemProject.Name,
+				OwnerId: itemProject.OwnerID,
+			},
+		})
+	}
+	return items, nil
 }
 
 func (i ItemDB) AssignItemToProject(ctx context.Context, ProjectId string) {
@@ -22,19 +51,19 @@ func (i ItemDB) AssignItemToProject(ctx context.Context, ProjectId string) {
 	panic("implement me")
 }
 
-func (i ItemDB) GetProject(ctx context.Context, ID string) (*todoitem.Project, error) {
+func (i ItemDB) GetProject(ctx context.Context, ID string) (*tododomain.Project, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (i ItemDB) GetAllMemberProjects(ctx context.Context, OwnerId string) ([]*todoitem.Project, error) {
+func (i ItemDB) GetAllMemberProjects(ctx context.Context, OwnerId string) ([]*tododomain.Project, error) {
 	dbProjects, err := i.ProjectClient.Query().Where(project.OwnerID(OwnerId)).All(ctx)
 	if err != nil {
 		return nil, err
 	}
-	var projects []*todoitem.Project
+	var projects []*tododomain.Project
 	for _, dbProject := range dbProjects {
-		projects = append(projects, &todoitem.Project{
+		projects = append(projects, &tododomain.Project{
 			Name:    dbProject.Name,
 			OwnerId: dbProject.OwnerID,
 			UUId:    dbProject.UUID,
@@ -43,7 +72,7 @@ func (i ItemDB) GetAllMemberProjects(ctx context.Context, OwnerId string) ([]*to
 	return projects, nil
 }
 
-func (i ItemDB) CreateItem(ctx context.Context, newItem *todoitem.Item) error {
+func (i ItemDB) CreateItem(ctx context.Context, newItem *tododomain.Item) error {
 	createItemQuery := i.ItemClient.Create().SetOwnerID(newItem.OwnerId).SetTitle(newItem.Title)
 	if newItem.Project != nil {
 		projectId, err := i.ProjectClient.Query().Where(project.UUID(newItem.Project.UUId)).FirstID(ctx)

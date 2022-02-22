@@ -28,12 +28,16 @@ func init() {
 	project.DefaultUUID = projectDescUUID.Default.(func() uuid.UUID)
 	todoitemFields := schema.TodoItem{}.Fields()
 	_ = todoitemFields
+	// todoitemDescIsDone is the schema descriptor for is_done field.
+	todoitemDescIsDone := todoitemFields[1].Descriptor()
+	// todoitem.DefaultIsDone holds the default value on creation for the is_done field.
+	todoitem.DefaultIsDone = todoitemDescIsDone.Default.(bool)
 	// todoitemDescCreatedAt is the schema descriptor for created_at field.
-	todoitemDescCreatedAt := todoitemFields[1].Descriptor()
+	todoitemDescCreatedAt := todoitemFields[2].Descriptor()
 	// todoitem.DefaultCreatedAt holds the default value on creation for the created_at field.
 	todoitem.DefaultCreatedAt = todoitemDescCreatedAt.Default.(func() time.Time)
 	// todoitemDescUUID is the schema descriptor for uuid field.
-	todoitemDescUUID := todoitemFields[2].Descriptor()
+	todoitemDescUUID := todoitemFields[3].Descriptor()
 	// todoitem.DefaultUUID holds the default value on creation for the uuid field.
 	todoitem.DefaultUUID = todoitemDescUUID.Default.(func() uuid.UUID)
 	userFields := schema.User{}.Fields()
