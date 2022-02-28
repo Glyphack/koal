@@ -8,14 +8,14 @@ import (
 )
 
 type TodoRepository interface {
-	AllItems(ctx context.Context, OwnerId string) ([]*tododomain.Item, error)
-	AllUndoneItems(ctx context.Context, ownerId string) ([]*tododomain.Item, error)
-	CreateItem(ctx context.Context, newItem *tododomain.Item) error
+	AllItems(ctx context.Context, OwnerId string) ([]*tododomain.TodoItem, error)
+	GetItemById(ctx context.Context, Id string) (*tododomain.TodoItem, error)
+	AllUndoneItems(ctx context.Context, ownerId string) ([]*tododomain.TodoItem, error)
+	CreateItem(ctx context.Context, newItem *tododomain.TodoItem) error
 	DeleteItem(ctx context.Context, ID string) error
-	AssignItemToProject(ctx context.Context, ProjectId string)
 	GetAllMemberProjects(ctx context.Context, OwnerId string) ([]*tododomain.Project, error)
-	CreateProject(ctx context.Context, name string) error
-	GetProject(ctx context.Context, ID string) (*tododomain.Project, error)
+	CreateProject(ctx context.Context, project *tododomain.Project) error
+	GetProject(ctx context.Context, ID string) (*tododomain.ProjectInfo, error)
 	DeleteProject(ctx context.Context, ID string) error
 	UpdateProjectById(ctx context.Context, ID string, name string) error
 }

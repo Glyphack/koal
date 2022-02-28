@@ -5,7 +5,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type Item struct {
+type TodoItem struct {
 	UUId    uuid.UUID
 	Title   string
 	OwnerId string
@@ -15,7 +15,7 @@ type Item struct {
 
 var PermissionDenied = errors.New("you cannot edit this item")
 
-func (i *Item) UpdateTitle(UserId string, newTitle string) error {
+func (i *TodoItem) UpdateTitle(UserId string, newTitle string) error {
 	if ok := isUserAllowedToEditItem(i, UserId); ok == false {
 		return PermissionDenied
 	}
@@ -23,7 +23,7 @@ func (i *Item) UpdateTitle(UserId string, newTitle string) error {
 	return nil
 }
 
-func (i *Item) UpdateStatus(UserId string, isDone bool) error {
+func (i *TodoItem) UpdateStatus(UserId string, isDone bool) error {
 	if ok := isUserAllowedToEditItem(i, UserId); ok == false {
 		return PermissionDenied
 	}
@@ -31,14 +31,14 @@ func (i *Item) UpdateStatus(UserId string, isDone bool) error {
 	return nil
 }
 
-func isUserAllowedToEditItem(item *Item, userId string) bool {
+func isUserAllowedToEditItem(item *TodoItem, userId string) bool {
 	if userId != item.OwnerId {
 		return false
 	}
 	return true
 }
 
-func IsUserAllowedToDeleteItem(item *Item, userId string) bool {
+func IsUserAllowedToDeleteItem(item *TodoItem, userId string) bool {
 	if userId != item.OwnerId {
 		return false
 	}

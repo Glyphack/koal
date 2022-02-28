@@ -2,11 +2,13 @@ package todoapi
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/glyphack/koal/ent"
 	todov1 "github.com/glyphack/koal/gen/proto/go/todo/v1"
-	todoitem "github.com/glyphack/koal/internal/module/todo/domain/todo"
+	tododomain "github.com/glyphack/koal/internal/module/todo/domain/todo"
 	todoinfra "github.com/glyphack/koal/internal/module/todo/infrastructure"
+	"github.com/glyphack/koal/internal/module/todo/usecase"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -14,10 +16,11 @@ import (
 )
 
 type server struct {
-	itemRepository todoinfra.TodoRepository
+	itemRepository    todoinfra.TodoRepository
+	useCaseInteractor todousecase.TodoUseCase
 }
 
-func (s server) GetProjects(ctx context.Context, empty *emptypb.Empty) (*todov1.GetProjectsResponse, error) {
+func (s server) GetProjects(ctx context.Context, _ *emptypb.Empty) (*todov1.GetProjectsResponse, error) {
 	projects, err := s.itemRepository.GetAllMemberProjects(ctx, fmt.Sprint(ctx.Value("userId")))
 	if err != nil {
 		return nil, status.Error(codes.Internal, "Cannot load user projects")
@@ -37,23 +40,78 @@ func (s server) GetProjects(ctx context.Context, empty *emptypb.Empty) (*todov1.
 }
 
 func (s server) GetProjectDetails(ctx context.Context, request *todov1.GetProjectDetailsRequest) (*todov1.GetProjectDetailsResponse, error) {
-	//TODO implement me
-	panic("implement me")
+	userId := fmt.Sprint(ctx.Value("userId"))
+	project, err := s.useCaseInteractor.GetProject(ctx, userId, request.Id)
+	if errors.Is(err, todousecase.PermissionDenied) {
+		return nil, status.Error(codes.PermissionDenied, err.Error())
+	} else if errors.Is(err, todousecase.ProjectDoesNotExist) {
+		return nil, status.Error(codes.NotFound, err.Error())
+	} else if err != nil {
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+	projectMsg := &todov1.Project{
+		Id:   project.Project.UUId.String(),
+		Name: project.Project.Name,
+	}
+	var itemsMsg []*todov1.TodoItem
+	for _, item := range project.Items {
+		itemsMsg = append(itemsMsg, &todov1.TodoItem{
+			Id:      item.UUId.String(),
+			Title:   item.Title,
+			IsDone:  item.IsDone,
+			Project: projectMsg,
+		})
+	}
+
+	return &todov1.GetProjectDetailsResponse{
+		Info:  projectMsg,
+		Items: itemsMsg,
+	}, nil
 }
 
 func (s server) CreateProject(ctx context.Context, request *todov1.CreateProjectRequest) (*todov1.CreateProjectResponse, error) {
-	//TODO implement me
-	panic("implement me")
+	userId := fmt.Sprint(ctx.Value("userId"))
+	project, err := s.useCaseInteractor.CreateProject(ctx, userId, request.Name)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &todov1.CreateProjectResponse{
+		CreatedProject: &todov1.Project{
+			Id:   project.UUId.String(),
+			Name: project.Name,
+		},
+	}, nil
 }
 
 func (s server) EditProject(ctx context.Context, request *todov1.EditProjectRequest) (*todov1.EditProjectResponse, error) {
-	//TODO implement me
-	panic("implement me")
+	userId := fmt.Sprint(ctx.Value("userId"))
+	project, err := s.useCaseInteractor.UpdateProject(ctx, userId, request.Project.Id, request.Project.Name)
+	if errors.Is(err, todousecase.PermissionDenied) {
+		return nil, status.Error(codes.PermissionDenied, err.Error())
+	} else if errors.Is(err, todousecase.ProjectDoesNotExist) {
+		return nil, status.Error(codes.NotFound, err.Error())
+	} else if err != nil {
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+	return &todov1.EditProjectResponse{
+		UpdatedProject: &todov1.Project{
+			Id:   project.UUId.String(),
+			Name: project.Name,
+		},
+	}, nil
 }
 
 func (s server) DeleteProject(ctx context.Context, request *todov1.DeleteProjectRequest) (*emptypb.Empty, error) {
-	//TODO implement me
-	panic("implement me")
+	userId := fmt.Sprint(ctx.Value("userId"))
+	err := s.useCaseInteractor.DeleteProject(ctx, userId, request.Id)
+	if errors.Is(err, todousecase.PermissionDenied) {
+		return nil, status.Error(codes.PermissionDenied, err.Error())
+	} else if errors.Is(err, todousecase.ProjectDoesNotExist) {
+		return nil, status.Error(codes.NotFound, err.Error())
+	} else if err != nil {
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+	return &emptypb.Empty{}, nil
 }
 
 func (s server) CreateTodoItem(ctx context.Context, request *todov1.CreateTodoItemRequest) (*todov1.CreateTodoItemResponse, error) {
@@ -65,40 +123,60 @@ func (s server) CreateTodoItem(ctx context.Context, request *todov1.CreateTodoIt
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "ProjectId is invalid")
 	}
-	todoItem := todoitem.Item{
+	todoItem := tododomain.TodoItem{
 		UUId:    uuid.New(),
 		Title:   request.Title,
 		OwnerId: fmt.Sprint(ctx.Value("userId")),
-		Project: &todoitem.Project{UUId: projectId},
+		Project: &tododomain.Project{UUId: projectId},
 	}
 	err = s.itemRepository.CreateItem(ctx, &todoItem)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "Cannot create todo item")
 	}
-	// TODO return project name
+
 	return &todov1.CreateTodoItemResponse{
 		CreatedItem: &todov1.TodoItem{
 			Id:     todoItem.UUId.String(),
 			Title:  todoItem.Title,
 			IsDone: false,
 			Project: &todov1.Project{
-				Id: todoItem.Project.UUId.String(),
+				Id:   todoItem.Project.UUId.String(),
+				Name: todoItem.Project.Name,
 			},
 		},
 	}, nil
 }
 
 func (s server) DeleteTodoItem(ctx context.Context, request *todov1.DeleteTodoItemRequest) (*emptypb.Empty, error) {
-	//TODO implement me
-	panic("implement me")
+	userId := fmt.Sprint(ctx.Value("userId"))
+	err := s.useCaseInteractor.DeleteItem(ctx, request.Id, userId)
+	if errors.Is(err, todousecase.PermissionDenied) {
+		return nil, status.Error(codes.PermissionDenied, err.Error())
+	}
+	if errors.Is(err, todousecase.ItemDoesNotExist) {
+		return nil, status.Error(codes.NotFound, err.Error())
+	}
+	return &emptypb.Empty{}, nil
 }
 
 func (s server) UpdateTodoItem(ctx context.Context, request *todov1.UpdateTodoItemRequest) (*emptypb.Empty, error) {
-	//TODO implement me
-	panic("implement me")
+	userId := fmt.Sprint(ctx.Value("userId"))
+	item, err := s.itemRepository.GetItemById(ctx, request.Id)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	err = item.UpdateTitle(userId, request.Title)
+	if err != nil {
+		return nil, status.Error(codes.PermissionDenied, err.Error())
+	}
+	err = item.UpdateStatus(userId, request.IsDone)
+	if err != nil {
+		return nil, status.Error(codes.PermissionDenied, err.Error())
+	}
+	return &emptypb.Empty{}, nil
 }
 
-func (s server) GetUndoneList(ctx context.Context, empty *emptypb.Empty) (*todov1.GetUndoneListResponse, error) {
+func (s server) GetUndoneList(ctx context.Context, _ *emptypb.Empty) (*todov1.GetUndoneListResponse, error) {
 	ownerId := fmt.Sprint(ctx.Value("userId"))
 	items, err := s.itemRepository.AllUndoneItems(ctx, ownerId)
 	if err != nil {
@@ -120,5 +198,9 @@ func (s server) GetUndoneList(ctx context.Context, empty *emptypb.Empty) (*todov
 }
 
 func NewServer(dbConnection *ent.Client) *server {
-	return &server{itemRepository: todoinfra.ItemDB{ItemClient: dbConnection.TodoItem, ProjectClient: dbConnection.Project}}
+	itemRepo := &todoinfra.ItemDB{ItemClient: dbConnection.TodoItem, ProjectClient: dbConnection.Project}
+	return &server{
+		itemRepository:    itemRepo,
+		useCaseInteractor: todousecase.TodoUseCase{TodoRepository: itemRepo},
+	}
 }
