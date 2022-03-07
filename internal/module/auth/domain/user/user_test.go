@@ -47,7 +47,6 @@ func TestGenerateToken(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-
 func TestCheckPassword(t *testing.T) {
 	user := authuser.User{Email: "testEmail@test.com"}
 	user.SetPassword("password")
