@@ -14,8 +14,29 @@ type TodoUseCase struct {
 }
 
 var ItemDoesNotExist = errors.New("item does not exist")
-var PermissionDenied = errors.New("not Allowed to delete item")
+var PermissionDenied = errors.New("not Authorized to do perform this action")
 var ProjectDoesNotExist = errors.New("cannot find project")
+
+func (u *TodoUseCase) UpdateItem(ctx context.Context, itemId string, newTitle string, isDone bool, userId string) (*tododomain.TodoItem, error) {
+	item, err := u.TodoRepository.GetItemById(ctx, itemId)
+
+	if err != nil {
+		return nil, errors.New("Internal Error")
+	}
+	err = item.UpdateTitle(userId, newTitle)
+	if err != nil {
+		return nil, err
+	}
+	err = item.UpdateStatus(userId, isDone)
+	if err != nil {
+		return nil, err
+	}
+	err = u.TodoRepository.UpdateItem(ctx, itemId, item)
+	if err != nil {
+		return nil, err
+	}
+	return item, nil
+}
 
 func (u *TodoUseCase) DeleteItem(ctx context.Context, itemId string, userId string) error {
 	item, err := u.TodoRepository.GetItemById(ctx, itemId)

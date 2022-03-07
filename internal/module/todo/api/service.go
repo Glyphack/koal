@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/glyphack/koal/ent"
 	todov1 "github.com/glyphack/koal/gen/proto/go/todo/v1"
 	tododomain "github.com/glyphack/koal/internal/module/todo/domain/todo"
 	todoinfra "github.com/glyphack/koal/internal/module/todo/infrastructure"
-	"github.com/glyphack/koal/internal/module/todo/usecase"
+	todousecase "github.com/glyphack/koal/internal/module/todo/usecase"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -83,17 +84,13 @@ func (s server) CreateProject(ctx context.Context, request *todov1.CreateProject
 	}, nil
 }
 
-func (s server) EditProject(ctx context.Context, request *todov1.EditProjectRequest) (*todov1.EditProjectResponse, error) {
+func (s server) EditProject(ctx context.Context, request *todov1.EditProjectRequest) (*todov1.DeleteProjectResponse, error) {
 	userId := fmt.Sprint(ctx.Value("userId"))
 	project, err := s.useCaseInteractor.UpdateProject(ctx, userId, request.Project.Id, request.Project.Name)
-	if errors.Is(err, todousecase.PermissionDenied) {
-		return nil, status.Error(codes.PermissionDenied, err.Error())
-	} else if errors.Is(err, todousecase.ProjectDoesNotExist) {
-		return nil, status.Error(codes.NotFound, err.Error())
-	} else if err != nil {
-		return nil, status.Error(codes.Internal, "internal error")
+	if err != nil {
+		return nil, TranslateDomainError(err)
 	}
-	return &todov1.EditProjectResponse{
+	return &todov1.DeleteProjectResponse{
 		UpdatedProject: &todov1.Project{
 			Id:   project.UUId.String(),
 			Name: project.Name,
@@ -104,21 +101,13 @@ func (s server) EditProject(ctx context.Context, request *todov1.EditProjectRequ
 func (s server) DeleteProject(ctx context.Context, request *todov1.DeleteProjectRequest) (*emptypb.Empty, error) {
 	userId := fmt.Sprint(ctx.Value("userId"))
 	err := s.useCaseInteractor.DeleteProject(ctx, userId, request.Id)
-	if errors.Is(err, todousecase.PermissionDenied) {
-		return nil, status.Error(codes.PermissionDenied, err.Error())
-	} else if errors.Is(err, todousecase.ProjectDoesNotExist) {
-		return nil, status.Error(codes.NotFound, err.Error())
-	} else if err != nil {
-		return nil, status.Error(codes.Internal, "internal error")
+	if err != nil {
+		return nil, TranslateDomainError(err)
 	}
 	return &emptypb.Empty{}, nil
 }
 
 func (s server) CreateTodoItem(ctx context.Context, request *todov1.CreateTodoItemRequest) (*todov1.CreateTodoItemResponse, error) {
-	if request.GetProjectId() == "" {
-		return nil, status.Error(codes.InvalidArgument, "Project must be specified")
-	}
-
 	projectId, err := uuid.Parse(request.GetProjectId())
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "ProjectId is invalid")
@@ -150,28 +139,17 @@ func (s server) CreateTodoItem(ctx context.Context, request *todov1.CreateTodoIt
 func (s server) DeleteTodoItem(ctx context.Context, request *todov1.DeleteTodoItemRequest) (*emptypb.Empty, error) {
 	userId := fmt.Sprint(ctx.Value("userId"))
 	err := s.useCaseInteractor.DeleteItem(ctx, request.Id, userId)
-	if errors.Is(err, todousecase.PermissionDenied) {
-		return nil, status.Error(codes.PermissionDenied, err.Error())
-	}
-	if errors.Is(err, todousecase.ItemDoesNotExist) {
-		return nil, status.Error(codes.NotFound, err.Error())
+	if err != nil {
+		return nil, TranslateDomainError(err)
 	}
 	return &emptypb.Empty{}, nil
 }
 
 func (s server) UpdateTodoItem(ctx context.Context, request *todov1.UpdateTodoItemRequest) (*emptypb.Empty, error) {
 	userId := fmt.Sprint(ctx.Value("userId"))
-	item, err := s.itemRepository.GetItemById(ctx, request.Id)
+	_, err := s.useCaseInteractor.UpdateItem(ctx, request.Id, request.Title, request.IsDone, userId)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-	err = item.UpdateTitle(userId, request.Title)
-	if err != nil {
-		return nil, status.Error(codes.PermissionDenied, err.Error())
-	}
-	err = item.UpdateStatus(userId, request.IsDone)
-	if err != nil {
-		return nil, status.Error(codes.PermissionDenied, err.Error())
+		return nil, TranslateDomainError(err)
 	}
 	return &emptypb.Empty{}, nil
 }
@@ -203,4 +181,15 @@ func NewServer(dbConnection *ent.Client) *server {
 		itemRepository:    itemRepo,
 		useCaseInteractor: todousecase.TodoUseCase{TodoRepository: itemRepo},
 	}
+}
+
+func TranslateDomainError(err error) error {
+	if errors.Is(err, todousecase.PermissionDenied) {
+		return status.Error(codes.PermissionDenied, err.Error())
+	} else if errors.Is(err, todousecase.ProjectDoesNotExist) {
+		return status.Error(codes.NotFound, err.Error())
+	} else if errors.Is(err, todousecase.ItemDoesNotExist) {
+		return status.Error(codes.NotFound, err.Error())
+	}
+	return status.Error(codes.Internal, "internal error")
 }

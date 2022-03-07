@@ -336,7 +336,7 @@ func (x *EditProjectRequest) GetProject() *Project {
 	return nil
 }
 
-type EditProjectResponse struct {
+type DeleteProjectResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -344,8 +344,8 @@ type EditProjectResponse struct {
 	UpdatedProject *Project `protobuf:"bytes,1,opt,name=updated_project,json=updatedProject,proto3" json:"updated_project,omitempty"`
 }
 
-func (x *EditProjectResponse) Reset() {
-	*x = EditProjectResponse{}
+func (x *DeleteProjectResponse) Reset() {
+	*x = DeleteProjectResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_todo_v1_todo_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -353,13 +353,13 @@ func (x *EditProjectResponse) Reset() {
 	}
 }
 
-func (x *EditProjectResponse) String() string {
+func (x *DeleteProjectResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*EditProjectResponse) ProtoMessage() {}
+func (*DeleteProjectResponse) ProtoMessage() {}
 
-func (x *EditProjectResponse) ProtoReflect() protoreflect.Message {
+func (x *DeleteProjectResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_todo_v1_todo_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -372,11 +372,11 @@ func (x *EditProjectResponse) ProtoReflect() protoreflect.Message {
 }
 
 // Deprecated: Use EditProjectResponse.ProtoReflect.Descriptor instead.
-func (*EditProjectResponse) Descriptor() ([]byte, []int) {
+func (*DeleteProjectResponse) Descriptor() ([]byte, []int) {
 	return file_todo_v1_todo_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *EditProjectResponse) GetUpdatedProject() *Project {
+func (x *DeleteProjectResponse) GetUpdatedProject() *Project {
 	if x != nil {
 		return x.UpdatedProject
 	}
@@ -994,7 +994,7 @@ var file_todo_v1_todo_proto_goTypes = []interface{}{
 	(*CreateProjectRequest)(nil),      // 3: todo.v1.CreateProjectRequest
 	(*CreateProjectResponse)(nil),     // 4: todo.v1.CreateProjectResponse
 	(*EditProjectRequest)(nil),        // 5: todo.v1.EditProjectRequest
-	(*EditProjectResponse)(nil),       // 6: todo.v1.EditProjectResponse
+	(*DeleteProjectResponse)(nil),       // 6: todo.v1.EditProjectResponse
 	(*GetProjectDetailsRequest)(nil),  // 7: todo.v1.GetProjectDetailsRequest
 	(*DeleteProjectRequest)(nil),      // 8: todo.v1.DeleteProjectRequest
 	(*GetProjectDetailsResponse)(nil), // 9: todo.v1.GetProjectDetailsResponse
@@ -1119,7 +1119,7 @@ func file_todo_v1_todo_proto_init() {
 			}
 		}
 		file_todo_v1_todo_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EditProjectResponse); i {
+			switch v := v.(*DeleteProjectResponse); i {
 			case 0:
 				return &v.state
 			case 1:

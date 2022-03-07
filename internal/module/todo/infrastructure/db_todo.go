@@ -28,7 +28,7 @@ func (i ItemDB) GetItemById(ctx context.Context, Id string) (*tododomain.TodoIte
 	if err != nil {
 		return nil, err
 	}
-	dbItem, err := i.ItemClient.Query().Where(todoitem.UUID(itemUUID)).First(ctx)
+	dbItem, err := i.ItemClient.Query().Where(todoitem.UUID(itemUUID)).WithProject().First(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -36,9 +36,25 @@ func (i ItemDB) GetItemById(ctx context.Context, Id string) (*tododomain.TodoIte
 		UUId:    dbItem.UUID,
 		Title:   dbItem.Title,
 		OwnerId: dbItem.OwnerID,
-		Project: nil,
+		IsDone:  dbItem.IsDone,
+		Project: &tododomain.Project{
+			UUId:    dbItem.Edges.Project.UUID,
+			Name:    dbItem.Edges.Project.Name,
+			OwnerId: dbItem.Edges.Project.OwnerID,
+		},
 	}, nil
 
+}
+func (i ItemDB) UpdateItem(ctx context.Context, Id string, updatedItem *tododomain.TodoItem) error {
+	itemUUID, err := uuid.Parse(Id)
+	if err != nil {
+		return err
+	}
+	_, err = i.ItemClient.Update().Where(todoitem.UUID(itemUUID)).SetTitle(updatedItem.Title).SetIsDone(updatedItem.IsDone).Save(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (i ItemDB) AllItems(ctx context.Context, OwnerId string) ([]*tododomain.TodoItem, error) {
@@ -93,7 +109,7 @@ func (i ItemDB) AllUndoneItems(ctx context.Context, ownerId string) ([]*tododoma
 func (i ItemDB) GetProject(ctx context.Context, ID string) (*tododomain.ProjectInfo, error) {
 	projectUUID, _ := uuid.Parse(ID)
 	dbProject, err := i.ProjectClient.Query().Where(
-		project.UUID(projectUUID)).First(ctx)
+		project.UUID(projectUUID)).WithItems().First(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -134,16 +150,11 @@ func (i ItemDB) GetAllMemberProjects(ctx context.Context, OwnerId string) ([]*to
 }
 
 func (i ItemDB) CreateItem(ctx context.Context, newItem *tododomain.TodoItem) error {
-	createItemQuery := i.ItemClient.Create().SetOwnerID(newItem.OwnerId).SetTitle(newItem.Title).SetUUID(newItem.UUId)
-	if newItem.Project != nil {
-		projectId, err := i.ProjectClient.Query().Where(project.UUID(newItem.Project.UUId)).FirstID(ctx)
-		if err != nil {
-			return err
-		}
-		createItemQuery.SetProjectID(projectId)
+	projectId, err := i.ProjectClient.Query().Where(project.UUID(newItem.Project.UUId)).FirstID(ctx)
+	if err != nil {
+		return err
 	}
-
-	err := createItemQuery.Exec(ctx)
+	err = i.ItemClient.Create().SetOwnerID(newItem.OwnerId).SetTitle(newItem.Title).SetUUID(newItem.UUId).SetProjectID(projectId).Exec(ctx)
 	if err != nil {
 		return err
 	}
