@@ -15,8 +15,29 @@ type ItemDB struct {
 	ItemClient    *ent.TodoItemClient
 }
 
-func (i ItemDB) CreateProject(ctx context.Context, project *tododomain.Project) error {
-	err := i.ProjectClient.Create().SetName(project.Name).SetOwnerID(project.OwnerId).SetUUID(project.UUId).Exec(ctx)
+func (i ItemDB) CreateItem(ctx context.Context, newItem *tododomain.TodoItem) error {
+	if newItem.Project == nil {
+		err := i.ItemClient.Create().SetOwnerID(newItem.OwnerId).SetTitle(newItem.Title).SetUUID(newItem.UUId).Exec(ctx)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	projectId, err := i.ProjectClient.Query().Where(project.UUID(newItem.Project.UUId)).FirstID(ctx)
+	if err != nil {
+		return err
+	}
+	err = i.ItemClient.Create().SetOwnerID(newItem.OwnerId).SetTitle(newItem.Title).SetUUID(newItem.UUId).SetProjectID(projectId).Exec(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (i ItemDB) DeleteItem(ctx context.Context, ID string) error {
+	itemUUID, _ := uuid.Parse(ID)
+	_, err := i.ItemClient.Delete().Where(todoitem.UUID(itemUUID)).Exec(ctx)
 	if err != nil {
 		return err
 	}
@@ -32,15 +53,26 @@ func (i ItemDB) GetItemById(ctx context.Context, Id string) (*tododomain.TodoIte
 	if err != nil {
 		return nil, err
 	}
+	project, projectNotExist := dbItem.Edges.ProjectOrErr()
+	if projectNotExist != nil {
+		return &tododomain.TodoItem{
+			UUId:    dbItem.UUID,
+			Title:   dbItem.Title,
+			OwnerId: dbItem.OwnerID,
+			IsDone:  dbItem.IsDone,
+			Project: nil,
+		}, nil
+
+	}
 	return &tododomain.TodoItem{
 		UUId:    dbItem.UUID,
 		Title:   dbItem.Title,
 		OwnerId: dbItem.OwnerID,
 		IsDone:  dbItem.IsDone,
 		Project: &tododomain.Project{
-			UUId:    dbItem.Edges.Project.UUID,
-			Name:    dbItem.Edges.Project.Name,
-			OwnerId: dbItem.Edges.Project.OwnerID,
+			UUId:    project.UUID,
+			Name:    project.Name,
+			OwnerId: project.OwnerID,
 		},
 	}, nil
 
@@ -106,6 +138,15 @@ func (i ItemDB) AllUndoneItems(ctx context.Context, ownerId string) ([]*tododoma
 	}
 	return items, nil
 }
+
+func (i ItemDB) CreateProject(ctx context.Context, project *tododomain.Project) error {
+	err := i.ProjectClient.Create().SetName(project.Name).SetOwnerID(project.OwnerId).SetUUID(project.UUId).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (i ItemDB) GetProject(ctx context.Context, ID string) (*tododomain.ProjectInfo, error) {
 	projectUUID, _ := uuid.Parse(ID)
 	dbProject, err := i.ProjectClient.Query().Where(
@@ -147,28 +188,6 @@ func (i ItemDB) GetAllMemberProjects(ctx context.Context, OwnerId string) ([]*to
 		})
 	}
 	return projects, nil
-}
-
-func (i ItemDB) CreateItem(ctx context.Context, newItem *tododomain.TodoItem) error {
-	projectId, err := i.ProjectClient.Query().Where(project.UUID(newItem.Project.UUId)).FirstID(ctx)
-	if err != nil {
-		return err
-	}
-	err = i.ItemClient.Create().SetOwnerID(newItem.OwnerId).SetTitle(newItem.Title).SetUUID(newItem.UUId).SetProjectID(projectId).Exec(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (i ItemDB) DeleteItem(ctx context.Context, ID string) error {
-	itemUUID, _ := uuid.Parse(ID)
-	_, err := i.ItemClient.Delete().Where(todoitem.UUID(itemUUID)).Exec(ctx)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (i ItemDB) DeleteProject(ctx context.Context, ID string) error {
