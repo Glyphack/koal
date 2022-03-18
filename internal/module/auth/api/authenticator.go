@@ -3,6 +3,7 @@ package authapi
 import (
 	"context"
 	"fmt"
+
 	"github.com/golang-jwt/jwt"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"github.com/spf13/viper"
@@ -10,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func parseToken(tokenString string) (*jwt.StandardClaims, error) {
+func parseToken(tokenString string) (*jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -21,11 +22,10 @@ func parseToken(tokenString string) (*jwt.StandardClaims, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	if claims, ok := token.Claims.(jwt.StandardClaims); ok && token.Valid {
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if ok && token.Valid {
 		return &claims, nil
 	}
-
 	return nil, err
 }
 
@@ -43,7 +43,7 @@ func AuthFunc(ctx context.Context) (context.Context, error) {
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "invalid auth token: %v", err)
 	}
-	newCtx := context.WithValue(ctx, "userId", tokenInfo.Subject)
+	newCtx := context.WithValue(ctx, "userId", userClaimFromToken(*tokenInfo))
 
 	return newCtx, nil
 }
