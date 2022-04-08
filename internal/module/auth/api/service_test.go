@@ -30,6 +30,18 @@ func TestRegisterValidInput(t *testing.T) {
 	assert.True(t, token.Valid)
 }
 
+func TestDuplicateRegisterInput(t *testing.T) {
+	client := enttest.Open(t, "sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
+	defer client.Close()
+	server := authapi.NewServer(client)
+	response, err := server.Register(context.Background(), &authv1.RegisterRequest{Email: "mail@test.com", Password: "password"})
+	assert.Nil(t, err)
+	token, err := jwt.Parse(response.GetToken(), func(token *jwt.Token) (interface{}, error) {
+		return []byte(viper.GetString("jwt_secret")), nil
+	})
+	assert.True(t, token.Valid)
+}
+
 func TestRegisterInvalidEmail(t *testing.T) {
 	client := enttest.Open(t, "sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
 	defer client.Close()

@@ -1,1 +1,2 @@
 allowed_origin: "*"
+sentry_dsn: ""

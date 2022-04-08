@@ -38,6 +38,9 @@ func (i ItemDB) CreateItem(ctx context.Context, newItem *tododomain.TodoItem) er
 func (i ItemDB) DeleteItem(ctx context.Context, ID string) error {
 	itemUUID, _ := uuid.Parse(ID)
 	_, err := i.ItemClient.Delete().Where(todoitem.UUID(itemUUID)).Exec(ctx)
+	if ent.IsNotFound(err) {
+		return NotFoundErr
+	}
 	if err != nil {
 		return err
 	}
@@ -50,6 +53,9 @@ func (i ItemDB) GetItemById(ctx context.Context, Id string) (*tododomain.TodoIte
 		return nil, err
 	}
 	dbItem, err := i.ItemClient.Query().Where(todoitem.UUID(itemUUID)).WithProject().First(ctx)
+	if ent.IsNotFound(err) {
+		return nil, NotFoundErr
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -77,12 +83,16 @@ func (i ItemDB) GetItemById(ctx context.Context, Id string) (*tododomain.TodoIte
 	}, nil
 
 }
+
 func (i ItemDB) UpdateItem(ctx context.Context, Id string, updatedItem *tododomain.TodoItem) error {
 	itemUUID, err := uuid.Parse(Id)
 	if err != nil {
 		return err
 	}
 	_, err = i.ItemClient.Update().Where(todoitem.UUID(itemUUID)).SetTitle(updatedItem.Title).SetIsDone(updatedItem.IsDone).Save(ctx)
+	if ent.IsNotFound(err) {
+		return NotFoundErr
+	}
 	if err != nil {
 		return err
 	}
@@ -91,6 +101,9 @@ func (i ItemDB) UpdateItem(ctx context.Context, Id string, updatedItem *tododoma
 
 func (i ItemDB) AllItems(ctx context.Context, OwnerId string) ([]*tododomain.TodoItem, error) {
 	dbItems, err := i.ItemClient.Query().Where(todoitem.OwnerID(OwnerId)).WithProject().All(ctx)
+	if ent.IsNotFound(err) {
+		return nil, NotFoundErr
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -116,6 +129,9 @@ func (i ItemDB) AllUndoneItems(ctx context.Context, ownerId string) ([]*tododoma
 		todoitem.OwnerID(ownerId),
 		todoitem.IsDone(false),
 	).All(ctx)
+	if ent.IsNotFound(err) {
+		return nil, NotFoundErr
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -151,6 +167,9 @@ func (i ItemDB) GetProject(ctx context.Context, ID string) (*tododomain.ProjectI
 	projectUUID, _ := uuid.Parse(ID)
 	dbProject, err := i.ProjectClient.Query().Where(
 		project.UUID(projectUUID)).WithItems().First(ctx)
+	if ent.IsNotFound(err) {
+		return nil, NotFoundErr
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -193,6 +212,9 @@ func (i ItemDB) GetAllMemberProjects(ctx context.Context, OwnerId string) ([]*to
 func (i ItemDB) DeleteProject(ctx context.Context, ID string) error {
 	projectUUID, _ := uuid.Parse(ID)
 	_, err := i.ProjectClient.Delete().Where(project.UUID(projectUUID)).Exec(ctx)
+	if ent.IsNotFound(err) {
+		return NotFoundErr
+	}
 	if err != nil {
 		return err
 	}
@@ -202,6 +224,9 @@ func (i ItemDB) DeleteProject(ctx context.Context, ID string) error {
 func (i ItemDB) UpdateProjectById(ctx context.Context, ID string, name string) error {
 	projectUUID, _ := uuid.Parse(ID)
 	err := i.ProjectClient.Update().SetName(name).Where(project.UUID(projectUUID)).Exec(ctx)
+	if ent.IsNotFound(err) {
+		return NotFoundErr
+	}
 	if err != nil {
 		return err
 	}

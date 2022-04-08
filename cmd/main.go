@@ -2,16 +2,17 @@ package main
 
 import (
 	"context"
+	"log"
+	"net"
+	"net/http"
+	"time"
+
+	"github.com/getsentry/sentry-go"
 	todov1 "github.com/glyphack/koal/gen/proto/go/todo/v1"
 	todoapi "github.com/glyphack/koal/internal/module/todo/api"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
-	grpc_logrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
-	"github.com/sirupsen/logrus"
-	"log"
-	"net"
-	"net/http"
 
 	"github.com/glyphack/koal/ent"
 	"github.com/glyphack/koal/ent/migrate"
@@ -19,6 +20,7 @@ import (
 	"github.com/glyphack/koal/internal/config"
 	authapi "github.com/glyphack/koal/internal/module/auth/api"
 	"github.com/glyphack/koal/pkg/corsutils"
+	"github.com/glyphack/koal/pkg/sentrygrpc"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
@@ -35,12 +37,21 @@ func main() {
 		log.Fatalln("Failed to listen:", err)
 	}
 
+	err = sentry.Init(sentry.ClientOptions{
+		Dsn: viper.GetString("sentry_dsn"),
+	})
+	if err != nil {
+		log.Fatalf("sentry.Init: %s", err)
+	}
+	defer sentry.Flush(2 * time.Second)
+
 	ctx := context.Background()
 	s := grpc.NewServer(
 		grpc_middleware.WithUnaryServerChain(
 			grpc_auth.UnaryServerInterceptor(authapi.AuthFunc),
 			grpc_ctxtags.UnaryServerInterceptor(),
-			grpc_logrus.UnaryServerInterceptor(logrus.NewEntry(logrus.New()))),
+			sentrygrpc.UnaryServerInterceptor(),
+		),
 	)
 	client := newClient()
 	if err := client.Schema.Create(ctx, migrate.WithDropIndex(true), migrate.WithDropColumn(true), migrate.WithGlobalUniqueID(true)); err != nil {

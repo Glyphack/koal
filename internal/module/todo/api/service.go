@@ -43,12 +43,8 @@ func (s server) GetProjects(ctx context.Context, _ *emptypb.Empty) (*todov1.GetP
 func (s server) GetProjectDetails(ctx context.Context, request *todov1.GetProjectDetailsRequest) (*todov1.GetProjectDetailsResponse, error) {
 	userId := fmt.Sprint(ctx.Value("userId"))
 	project, err := s.useCaseInteractor.GetProject(ctx, userId, request.Id)
-	if errors.Is(err, todousecase.PermissionDenied) {
-		return nil, status.Error(codes.PermissionDenied, err.Error())
-	} else if errors.Is(err, todousecase.ProjectDoesNotExist) {
-		return nil, status.Error(codes.NotFound, err.Error())
-	} else if err != nil {
-		return nil, status.Error(codes.Internal, "internal error")
+	if err != nil {
+		return nil, TranslateDomainAndInfraError(err)
 	}
 	projectMsg := &todov1.Project{
 		Id:   project.Project.UUId.String(),
@@ -88,7 +84,7 @@ func (s server) EditProject(ctx context.Context, request *todov1.EditProjectRequ
 	userId := fmt.Sprint(ctx.Value("userId"))
 	project, err := s.useCaseInteractor.UpdateProject(ctx, userId, request.Project.Id, request.Project.Name)
 	if err != nil {
-		return nil, TranslateDomainError(err)
+		return nil, TranslateDomainAndInfraError(err)
 	}
 	return &todov1.DeleteProjectResponse{
 		UpdatedProject: &todov1.Project{
@@ -102,7 +98,7 @@ func (s server) DeleteProject(ctx context.Context, request *todov1.DeleteProject
 	userId := fmt.Sprint(ctx.Value("userId"))
 	err := s.useCaseInteractor.DeleteProject(ctx, userId, request.Id)
 	if err != nil {
-		return nil, TranslateDomainError(err)
+		return nil, TranslateDomainAndInfraError(err)
 	}
 	return &emptypb.Empty{}, nil
 }
@@ -140,7 +136,7 @@ func (s server) DeleteTodoItem(ctx context.Context, request *todov1.DeleteTodoIt
 	userId := fmt.Sprint(ctx.Value("userId"))
 	err := s.useCaseInteractor.DeleteItem(ctx, request.Id, userId)
 	if err != nil {
-		return nil, TranslateDomainError(err)
+		return nil, TranslateDomainAndInfraError(err)
 	}
 	return &emptypb.Empty{}, nil
 }
@@ -149,7 +145,7 @@ func (s server) UpdateTodoItem(ctx context.Context, request *todov1.UpdateTodoIt
 	userId := fmt.Sprint(ctx.Value("userId"))
 	_, err := s.useCaseInteractor.UpdateItem(ctx, request.Id, request.Title, request.IsDone, userId)
 	if err != nil {
-		return nil, TranslateDomainError(err)
+		return nil, TranslateDomainAndInfraError(err)
 	}
 	return &emptypb.Empty{}, nil
 }
@@ -183,12 +179,10 @@ func NewServer(dbConnection *ent.Client) *server {
 	}
 }
 
-func TranslateDomainError(err error) error {
+func TranslateDomainAndInfraError(err error) error {
 	if errors.Is(err, todousecase.PermissionDenied) {
 		return status.Error(codes.PermissionDenied, err.Error())
-	} else if errors.Is(err, todousecase.ProjectDoesNotExist) {
-		return status.Error(codes.NotFound, err.Error())
-	} else if errors.Is(err, todousecase.ItemDoesNotExist) {
+	} else if errors.Is(err, todoinfra.NotFoundErr) {
 		return status.Error(codes.NotFound, err.Error())
 	}
 	return status.Error(codes.Internal, "internal error")

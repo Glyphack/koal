@@ -2,10 +2,14 @@ package todoinfra
 
 import (
 	"context"
+	"errors"
 
 	tododomain "github.com/glyphack/koal/internal/module/todo/domain/todo"
 	_ "github.com/mattn/go-sqlite3"
 )
+
+// Database access not found errors have to be converted to this error
+var NotFoundErr = errors.New("Entry does not exist")
 
 type TodoRepository interface {
 	AllItems(ctx context.Context, OwnerId string) ([]*tododomain.TodoItem, error)

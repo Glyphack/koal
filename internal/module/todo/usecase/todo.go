@@ -2,7 +2,6 @@ package todousecase
 
 import (
 	"context"
-	"errors"
 
 	tododomain "github.com/glyphack/koal/internal/module/todo/domain/todo"
 	todoinfra "github.com/glyphack/koal/internal/module/todo/infrastructure"
@@ -13,15 +12,11 @@ type TodoUseCase struct {
 	TodoRepository todoinfra.TodoRepository
 }
 
-var ItemDoesNotExist = errors.New("item does not exist")
-var PermissionDenied = errors.New("not Authorized to do perform this action")
-var ProjectDoesNotExist = errors.New("cannot find project")
-
 func (u *TodoUseCase) UpdateItem(ctx context.Context, itemId string, newTitle string, isDone bool, userId string) (*tododomain.TodoItem, error) {
 	item, err := u.TodoRepository.GetItemById(ctx, itemId)
 
 	if err != nil {
-		return nil, errors.New("Internal Error")
+		return nil, err
 	}
 	err = item.UpdateTitle(userId, newTitle)
 	if err != nil {
@@ -41,7 +36,7 @@ func (u *TodoUseCase) UpdateItem(ctx context.Context, itemId string, newTitle st
 func (u *TodoUseCase) DeleteItem(ctx context.Context, itemId string, userId string) error {
 	item, err := u.TodoRepository.GetItemById(ctx, itemId)
 	if err != nil {
-		return ItemDoesNotExist
+		return err
 	}
 	ok := tododomain.IsUserAllowedToDeleteItem(item, userId)
 	if !ok {
@@ -62,14 +57,14 @@ func (u TodoUseCase) CreateProject(ctx context.Context, userId string, projectNa
 	}
 	err := u.TodoRepository.CreateProject(ctx, project)
 	if err != nil {
-		return nil, errors.New("cannot create TodoItem try again later")
+		return nil, err
 	}
 	return project, nil
 }
 func (u TodoUseCase) GetProject(ctx context.Context, userId string, projectId string) (*tododomain.ProjectInfo, error) {
 	dbProject, err := u.TodoRepository.GetProject(ctx, projectId)
 	if err != nil {
-		return nil, ProjectDoesNotExist
+		return nil, err
 	}
 	if dbProject.Project.OwnerId != userId {
 		return nil, PermissionDenied
@@ -80,8 +75,7 @@ func (u TodoUseCase) GetProject(ctx context.Context, userId string, projectId st
 func (u TodoUseCase) UpdateProject(ctx context.Context, userId string, projectId string, name string) (*tododomain.Project, error) {
 	projectInfo, err := u.TodoRepository.GetProject(ctx, projectId)
 	if err != nil {
-
-		return nil, ProjectDoesNotExist
+		return nil, err
 	}
 	if projectInfo.Project.OwnerId != userId {
 		return nil, PermissionDenied
@@ -98,7 +92,7 @@ func (u TodoUseCase) UpdateProject(ctx context.Context, userId string, projectId
 func (u TodoUseCase) DeleteProject(ctx context.Context, userId string, projectId string) error {
 	projectInfo, err := u.TodoRepository.GetProject(ctx, projectId)
 	if err != nil {
-		return ProjectDoesNotExist
+		return err
 	}
 	if projectInfo.Project.OwnerId != userId {
 		return PermissionDenied
