@@ -2,11 +2,12 @@ package authuser
 
 import (
 	"errors"
+	"time"
+
 	"github.com/glyphack/koal/pkg/email"
 	"github.com/glyphack/koal/pkg/passwordutils"
 	"github.com/golang-jwt/jwt"
 	"github.com/spf13/viper"
-	"time"
 )
 
 var PasswordIsNotValidError = errors.New("Password must at least be 7 characters long")

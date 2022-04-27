@@ -18,9 +18,10 @@ func TestCreateUser(t *testing.T) {
 	defer client.Close()
 
 	userRepo := authinfra.UserRepositoryDB{Client: client.User}
-	user := &authuser.User{}
-	user.SetEmailAddress("email@test.com")
-	user.SetPassword("password")
+	user := &authuser.User{
+		Email:    "email@test.com",
+		Password: "password",
+	}
 	err := userRepo.CreateUser(context.Background(), user)
 	assert.Nil(t, err)
 }

@@ -2,6 +2,7 @@ package authapi
 
 import (
 	"context"
+
 	"github.com/glyphack/koal/ent"
 	authv1pb "github.com/glyphack/koal/gen/proto/go/auth/v1"
 	authuser "github.com/glyphack/koal/internal/module/auth/domain/user"
@@ -20,14 +21,14 @@ func NewServer(dbConnection *ent.Client) *server {
 }
 
 func (s *server) Register(ctx context.Context, in *authv1pb.RegisterRequest) (*authv1pb.RegisterResponse, error) {
-	newUser := authuser.User{}
+	newUser := &authuser.User{}
 	if err := newUser.SetEmailAddress(in.GetEmail()); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 	if err := newUser.SetPassword(in.GetPassword()); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	err := s.userRepository.CreateUser(ctx, &newUser)
+	err := s.userRepository.CreateUser(ctx, newUser)
 	if err != nil {
 		log.WithError(err).Error("Error while saving registered user")
 	}

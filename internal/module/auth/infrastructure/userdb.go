@@ -7,6 +7,7 @@ import (
 	"github.com/glyphack/koal/ent"
 	"github.com/glyphack/koal/ent/user"
 	authuser "github.com/glyphack/koal/internal/module/auth/domain/user"
+	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -15,7 +16,7 @@ type UserRepositoryDB struct {
 }
 
 func (u *UserRepositoryDB) CreateUser(ctx context.Context, newUser *authuser.User) error {
-	err := u.Client.Create().SetEmail(newUser.Email).SetPassword(newUser.Password).Exec(ctx)
+	err := u.Client.Create().SetEmail(newUser.Email).SetPassword(newUser.Password).SetUUID(uuid.New()).Exec(ctx)
 	if err != nil {
 		return err
 	}
