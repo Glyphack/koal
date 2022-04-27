@@ -385,3 +385,110 @@ func (suite *TodoUseCaseSuite) TestTodoUseCase_DeleteProject() {
 		})
 	}
 }
+
+func (suite *TodoUseCaseSuite) TestTodoUseCase_UpdateItem() {
+	testItem := &tododomain.TodoItem{
+		UUId:    uuid.New(),
+		Title:   "title",
+		OwnerId: "owner1",
+		Project: &tododomain.Project{
+			UUId:    uuid.New(),
+			Name:    "testProject",
+			OwnerId: "owner1",
+		},
+		IsDone: false,
+	}
+	todo_repo_mock := &todoinfra.TodoRepositoryMock{
+		GetItemByIdFunc: func(ctx context.Context, Id string) (*tododomain.TodoItem, error) {
+			return testItem, nil
+		},
+		UpdateItemFunc: func(ctx context.Context, Id string, updatedItem *tododomain.TodoItem) error {
+			return nil
+		},
+	}
+	type args struct {
+		ctx      context.Context
+		userId   string
+		itemId   string
+		newTitle string
+		isDone   bool
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *tododomain.TodoItem
+		wantErr bool
+	}{
+		{
+			name: "can make item done",
+			args: args{
+				ctx:      context.Background(),
+				userId:   testItem.OwnerId,
+				itemId:   testItem.UUId.String(),
+				newTitle: testItem.Title,
+				isDone:   true,
+			},
+			want: &tododomain.TodoItem{
+				UUId:    testItem.UUId,
+				Title:   testItem.Title,
+				OwnerId: testItem.OwnerId,
+				Project: testItem.Project,
+				IsDone:  true,
+			},
+			wantErr: false,
+		},
+		{
+			name: "can change item title",
+			args: args{
+				ctx:      context.Background(),
+				userId:   testItem.OwnerId,
+				itemId:   testItem.UUId.String(),
+				newTitle: "new",
+				isDone:   true,
+			},
+			want: &tododomain.TodoItem{
+				UUId:    testItem.UUId,
+				Title:   "new",
+				OwnerId: testItem.OwnerId,
+				Project: testItem.Project,
+				IsDone:  true,
+			},
+			wantErr: false,
+		},
+		{
+			name: "cannot change item title without permission",
+			args: args{
+				ctx:      context.Background(),
+				userId:   testItem.OwnerId,
+				itemId:   testItem.UUId.String(),
+				newTitle: testItem.Title,
+				isDone:   true,
+			},
+			want: &tododomain.TodoItem{
+				UUId:    testItem.UUId,
+				Title:   testItem.Title,
+				OwnerId: testItem.OwnerId,
+				Project: testItem.Project,
+				IsDone:  true,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		suite.Run(tt.name, func() {
+			t := suite.T()
+			u := todousecase.TodoUseCase{
+				TodoRepository: todo_repo_mock,
+			}
+			actual, err := u.UpdateItem(tt.args.ctx, tt.args.itemId, tt.args.newTitle, tt.args.isDone, tt.args.userId)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("TodoUseCase.DeleteProject() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if !reflect.DeepEqual(actual, tt.want) {
+				t.Errorf("TodoUseCase.UpdateProject() = %v, want %v", actual, tt.want)
+			}
+
+		})
+	}
+
+}
