@@ -32,3 +32,19 @@ Modules all follow the same architectural pattern. They are using DDD, and this 
 
 1. Auth: Implements auth API
 2. Todo: Implements the todo features
+
+## Development
+
+### Running locally
+
+Install dependencies and run the project
+
+    ```bash
+        go mod vendor
+        go run cmd/main.go
+    ```
+Then you can interact with API using the Swagger UI at the address `/api-docs/swagger`
+
+### Build
+
+Install buf, [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway#installation)
