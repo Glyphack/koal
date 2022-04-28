@@ -14,7 +14,6 @@ type TodoUseCase struct {
 
 func (u *TodoUseCase) UpdateItem(ctx context.Context, itemId string, newTitle string, isDone bool, userId string) (*tododomain.TodoItem, error) {
 	item, err := u.TodoRepository.GetItemById(ctx, itemId)
-
 	if err != nil {
 		return nil, err
 	}
