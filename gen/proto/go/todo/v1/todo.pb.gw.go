@@ -440,12 +440,13 @@ func RegisterTodoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/GetProjects", runtime.WithHTTPPathPattern("/v1/todo/projects"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/GetProjects", runtime.WithHTTPPathPattern("/v1/todo/projects"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_TodoService_GetProjects_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_TodoService_GetProjects_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -463,12 +464,13 @@ func RegisterTodoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/GetProjectDetails", runtime.WithHTTPPathPattern("/v1/todo/projects/{id}"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/GetProjectDetails", runtime.WithHTTPPathPattern("/v1/todo/projects/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_TodoService_GetProjectDetails_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_TodoService_GetProjectDetails_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -486,12 +488,13 @@ func RegisterTodoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/CreateProject", runtime.WithHTTPPathPattern("/v1/todo/projects"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/CreateProject", runtime.WithHTTPPathPattern("/v1/todo/projects"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_TodoService_CreateProject_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_TodoService_CreateProject_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -509,12 +512,13 @@ func RegisterTodoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/EditProject", runtime.WithHTTPPathPattern("/v1/todo/projects/{project.id}"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/EditProject", runtime.WithHTTPPathPattern("/v1/todo/projects/{project.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_TodoService_EditProject_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_TodoService_EditProject_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -532,12 +536,13 @@ func RegisterTodoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/DeleteProject", runtime.WithHTTPPathPattern("/v1/todo/projects/{id}"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/DeleteProject", runtime.WithHTTPPathPattern("/v1/todo/projects/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_TodoService_DeleteProject_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_TodoService_DeleteProject_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -555,12 +560,13 @@ func RegisterTodoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/CreateTodoItem", runtime.WithHTTPPathPattern("/v1/todo/items"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/CreateTodoItem", runtime.WithHTTPPathPattern("/v1/todo/items"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_TodoService_CreateTodoItem_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_TodoService_CreateTodoItem_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -578,12 +584,13 @@ func RegisterTodoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/DeleteTodoItem", runtime.WithHTTPPathPattern("/v1/todo/items/{id}"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/DeleteTodoItem", runtime.WithHTTPPathPattern("/v1/todo/items/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_TodoService_DeleteTodoItem_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_TodoService_DeleteTodoItem_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -601,12 +608,13 @@ func RegisterTodoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/UpdateTodoItem", runtime.WithHTTPPathPattern("/v1/todo/items/{id}"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/UpdateTodoItem", runtime.WithHTTPPathPattern("/v1/todo/items/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_TodoService_UpdateTodoItem_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_TodoService_UpdateTodoItem_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -624,12 +632,13 @@ func RegisterTodoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/GetUndoneList", runtime.WithHTTPPathPattern("/v1/todo/lists/undone"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/todo.v1.TodoService/GetUndoneList", runtime.WithHTTPPathPattern("/v1/todo/lists/undone"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_TodoService_GetUndoneList_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_TodoService_GetUndoneList_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
@@ -686,12 +695,13 @@ func RegisterTodoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/GetProjects", runtime.WithHTTPPathPattern("/v1/todo/projects"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/GetProjects", runtime.WithHTTPPathPattern("/v1/todo/projects"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_TodoService_GetProjects_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_TodoService_GetProjects_0(ctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -706,12 +716,13 @@ func RegisterTodoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/GetProjectDetails", runtime.WithHTTPPathPattern("/v1/todo/projects/{id}"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/GetProjectDetails", runtime.WithHTTPPathPattern("/v1/todo/projects/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_TodoService_GetProjectDetails_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_TodoService_GetProjectDetails_0(ctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -726,12 +737,13 @@ func RegisterTodoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/CreateProject", runtime.WithHTTPPathPattern("/v1/todo/projects"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/CreateProject", runtime.WithHTTPPathPattern("/v1/todo/projects"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_TodoService_CreateProject_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_TodoService_CreateProject_0(ctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -746,12 +758,13 @@ func RegisterTodoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/EditProject", runtime.WithHTTPPathPattern("/v1/todo/projects/{project.id}"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/EditProject", runtime.WithHTTPPathPattern("/v1/todo/projects/{project.id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_TodoService_EditProject_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_TodoService_EditProject_0(ctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -766,12 +779,13 @@ func RegisterTodoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/DeleteProject", runtime.WithHTTPPathPattern("/v1/todo/projects/{id}"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/DeleteProject", runtime.WithHTTPPathPattern("/v1/todo/projects/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_TodoService_DeleteProject_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_TodoService_DeleteProject_0(ctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -786,12 +800,13 @@ func RegisterTodoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/CreateTodoItem", runtime.WithHTTPPathPattern("/v1/todo/items"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/CreateTodoItem", runtime.WithHTTPPathPattern("/v1/todo/items"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_TodoService_CreateTodoItem_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_TodoService_CreateTodoItem_0(ctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -806,12 +821,13 @@ func RegisterTodoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/DeleteTodoItem", runtime.WithHTTPPathPattern("/v1/todo/items/{id}"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/DeleteTodoItem", runtime.WithHTTPPathPattern("/v1/todo/items/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_TodoService_DeleteTodoItem_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_TodoService_DeleteTodoItem_0(ctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -826,12 +842,13 @@ func RegisterTodoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/UpdateTodoItem", runtime.WithHTTPPathPattern("/v1/todo/items/{id}"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/UpdateTodoItem", runtime.WithHTTPPathPattern("/v1/todo/items/{id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_TodoService_UpdateTodoItem_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_TodoService_UpdateTodoItem_0(ctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
@@ -846,12 +863,13 @@ func RegisterTodoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/GetUndoneList", runtime.WithHTTPPathPattern("/v1/todo/lists/undone"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/todo.v1.TodoService/GetUndoneList", runtime.WithHTTPPathPattern("/v1/todo/lists/undone"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_TodoService_GetUndoneList_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_TodoService_GetUndoneList_0(ctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)

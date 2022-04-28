@@ -1,15 +1,15 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "auth/v1/auth.proto",
+    "title": "todo/v1/todo.proto",
     "version": "version not set"
   },
   "tags": [
     {
-      "name": "AuthService"
+      "name": "TodoService"
     },
     {
-      "name": "TodoService"
+      "name": "AuthService"
     }
   ],
   "consumes": [
@@ -355,7 +355,17 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1EditProjectRequest"
+              "type": "object",
+              "properties": {
+                "project": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
             }
           }
         ],
@@ -421,9 +431,6 @@
         "projectId": {
           "type": "string"
         },
-        "defaultProject": {
-          "type": "boolean"
-        },
         "title": {
           "type": "string",
           "required": [
@@ -440,14 +447,6 @@
       "properties": {
         "createdItem": {
           "$ref": "#/definitions/v1TodoItem"
-        }
-      }
-    },
-    "v1EditProjectRequest": {
-      "type": "object",
-      "properties": {
-        "project": {
-          "$ref": "#/definitions/v1Project"
         }
       }
     },
@@ -581,5 +580,18 @@
         }
       }
     }
-  }
+  },
+  "securityDefinitions": {
+    "bearer": {
+      "type": "apiKey",
+      "description": "Authentication token, prefixed by Bearer: Bearer \u003ctoken\u003e",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "security": [
+    {
+      "bearer": []
+    }
+  ]
 }

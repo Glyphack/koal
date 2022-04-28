@@ -28,7 +28,7 @@ type TodoServiceClient interface {
 	// Returns all the details for a project
 	GetProjectDetails(ctx context.Context, in *GetProjectDetailsRequest, opts ...grpc.CallOption) (*GetProjectDetailsResponse, error)
 	CreateProject(ctx context.Context, in *CreateProjectRequest, opts ...grpc.CallOption) (*CreateProjectResponse, error)
-	EditProject(ctx context.Context, in *EditProjectRequest, opts ...grpc.CallOption) (*DeleteProjectResponse, error)
+	EditProject(ctx context.Context, in *EditProjectRequest, opts ...grpc.CallOption) (*EditProjectResponse, error)
 	DeleteProject(ctx context.Context, in *DeleteProjectRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	CreateTodoItem(ctx context.Context, in *CreateTodoItemRequest, opts ...grpc.CallOption) (*CreateTodoItemResponse, error)
 	DeleteTodoItem(ctx context.Context, in *DeleteTodoItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -72,8 +72,8 @@ func (c *todoServiceClient) CreateProject(ctx context.Context, in *CreateProject
 	return out, nil
 }
 
-func (c *todoServiceClient) EditProject(ctx context.Context, in *EditProjectRequest, opts ...grpc.CallOption) (*DeleteProjectResponse, error) {
-	out := new(DeleteProjectResponse)
+func (c *todoServiceClient) EditProject(ctx context.Context, in *EditProjectRequest, opts ...grpc.CallOption) (*EditProjectResponse, error) {
+	out := new(EditProjectResponse)
 	err := c.cc.Invoke(ctx, "/todo.v1.TodoService/EditProject", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -135,7 +135,7 @@ type TodoServiceServer interface {
 	// Returns all the details for a project
 	GetProjectDetails(context.Context, *GetProjectDetailsRequest) (*GetProjectDetailsResponse, error)
 	CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error)
-	EditProject(context.Context, *EditProjectRequest) (*DeleteProjectResponse, error)
+	EditProject(context.Context, *EditProjectRequest) (*EditProjectResponse, error)
 	DeleteProject(context.Context, *DeleteProjectRequest) (*emptypb.Empty, error)
 	CreateTodoItem(context.Context, *CreateTodoItemRequest) (*CreateTodoItemResponse, error)
 	DeleteTodoItem(context.Context, *DeleteTodoItemRequest) (*emptypb.Empty, error)
@@ -157,7 +157,7 @@ func (UnimplementedTodoServiceServer) GetProjectDetails(context.Context, *GetPro
 func (UnimplementedTodoServiceServer) CreateProject(context.Context, *CreateProjectRequest) (*CreateProjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateProject not implemented")
 }
-func (UnimplementedTodoServiceServer) EditProject(context.Context, *EditProjectRequest) (*DeleteProjectResponse, error) {
+func (UnimplementedTodoServiceServer) EditProject(context.Context, *EditProjectRequest) (*EditProjectResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EditProject not implemented")
 }
 func (UnimplementedTodoServiceServer) DeleteProject(context.Context, *DeleteProjectRequest) (*emptypb.Empty, error) {
