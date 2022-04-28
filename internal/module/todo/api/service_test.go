@@ -445,6 +445,22 @@ func (suite *Suite) Test_server_UpdateTodoItem() {
 			},
 			wantErr: false,
 		},
+		{
+			name: "should ignore title if title is empty",
+			args: args{
+				ctx: testutils.GetAuthenticatedContext(context.Background(), projectWithItem.OwnerId),
+				in1: &todov1.UpdateTodoItemRequest{
+					Id:     item.UUId.String(),
+					Title:  "",
+					IsDone: item.IsDone,
+				}},
+			want: &todov1.UpdateTodoItemRequest{
+				Id:     item.UUId.String(),
+				Title:  item.Title,
+				IsDone: true,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {
