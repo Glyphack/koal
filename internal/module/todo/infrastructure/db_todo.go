@@ -185,6 +185,7 @@ func (i ItemDB) GetProject(ctx context.Context, ID string) (*tododomain.ProjectI
 			Title:   item.Title,
 			OwnerId: item.OwnerID,
 			Project: domainProject,
+			IsDone: item.IsDone,
 		})
 	}
 	return &tododomain.ProjectInfo{
