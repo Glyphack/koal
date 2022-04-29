@@ -473,6 +473,24 @@ func (suite *TodoUseCaseSuite) TestTodoUseCase_UpdateItem() {
 			},
 			wantErr: false,
 		},
+		{
+			name: "empty title will not change item title",
+			args: args{
+				ctx:      context.Background(),
+				userId:   testItem.OwnerId,
+				itemId:   testItem.UUId.String(),
+				newTitle: "",
+				isDone:   true,
+			},
+			want: &tododomain.TodoItem{
+				UUId:    testItem.UUId,
+				Title:   testItem.Title,
+				OwnerId: testItem.OwnerId,
+				Project: testItem.Project,
+				IsDone:  true,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {

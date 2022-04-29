@@ -17,9 +17,12 @@ func (u *TodoUseCase) UpdateItem(ctx context.Context, itemId string, newTitle st
 	if err != nil {
 		return nil, err
 	}
-	err = item.UpdateTitle(userId, newTitle)
-	if err != nil {
-		return nil, err
+
+	if newTitle != "" {
+		err = item.UpdateTitle(userId, newTitle)
+		if err != nil {
+			return nil, err
+		}
 	}
 	err = item.UpdateStatus(userId, isDone)
 	if err != nil {
