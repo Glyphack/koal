@@ -14,4 +14,4 @@ jobs:
           email: ${{ secrets.DOPRAX_EMAIL }}
           password: ${{ secrets.DOPRAX_PASSWORD }}
           api_key: ${{ secrets.DOPRAX_API_KEY}}
-          project_name: "koal-final"
+          project_name: "koal todo"
