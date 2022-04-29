@@ -208,7 +208,7 @@ func (suite *Suite) Test_server_EditProject() {
 	tests := []struct {
 		name    string
 		args    args
-		want    *todov1.DeleteProjectResponse
+		want    *todov1.EditProjectResponse
 		wantErr bool
 	}{
 		{
@@ -221,7 +221,7 @@ func (suite *Suite) Test_server_EditProject() {
 						Name: "New Name",
 					},
 				}},
-			want: &todov1.DeleteProjectResponse{
+			want: &todov1.EditProjectResponse{
 				UpdatedProject: &todov1.Project{
 					Id:   projectWithoutItem.UUId.String(),
 					Name: "New Name",
@@ -624,10 +624,11 @@ func TestServer_CreateTodoItem(t *testing.T) {
 	ownerId := "Sh"
 	ctx := testutils.GetAuthenticatedContext(context.Background(), ownerId)
 	project := client.Project.Create().SetOwnerID(ownerId).SetName("testProj1").SaveX(ctx)
-	response, err := server.CreateTodoItem(ctx, &todov1.CreateTodoItemRequest{
-		Project: &todov1.CreateTodoItemRequest_ProjectId{ProjectId: project.UUID.String()},
-		Title:   "new task",
-	})
+request :=&todov1.CreateTodoItemRequest{
+	ProjectId: project.UUID.String(),
+	Title:     "new task",
+} 
+	response, err := server.CreateTodoItem(ctx,request)
 	assert.Nil(t, err)
-	assert.Equal(t, client.TodoItem.Query().FirstX(ctx).Title, response.GetCreatedItem().GetTitle())
+	assert.Equal(t, response.GetCreatedItem().GetTitle(), request.Title)
 }

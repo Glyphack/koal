@@ -80,13 +80,13 @@ func (s server) CreateProject(ctx context.Context, request *todov1.CreateProject
 	}, nil
 }
 
-func (s server) EditProject(ctx context.Context, request *todov1.EditProjectRequest) (*todov1.DeleteProjectResponse, error) {
+func (s server) EditProject(ctx context.Context, request *todov1.EditProjectRequest) (*todov1.EditProjectResponse, error) {
 	userId := fmt.Sprint(ctx.Value("userId"))
 	project, err := s.useCaseInteractor.UpdateProject(ctx, userId, request.Project.Id, request.Project.Name)
 	if err != nil {
 		return nil, TranslateDomainAndInfraError(err)
 	}
-	return &todov1.DeleteProjectResponse{
+	return &todov1.EditProjectResponse{
 		UpdatedProject: &todov1.Project{
 			Id:   project.UUId.String(),
 			Name: project.Name,
