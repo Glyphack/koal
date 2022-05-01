@@ -457,7 +457,7 @@ func (suite *Suite) Test_server_UpdateTodoItem() {
 			want: &todov1.UpdateTodoItemRequest{
 				Id:     item.UUId.String(),
 				Title:  item.Title,
-				IsDone: true,
+				IsDone: item.IsDone,
 			},
 			wantErr: false,
 		},
