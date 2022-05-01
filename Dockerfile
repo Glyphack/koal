@@ -11,6 +11,4 @@ RUN go mod download
 COPY . .
 RUN go build -o ./out/koal ./cmd/main.go
 
-EXPOSE 8090
-
 CMD ["./out/koal"]

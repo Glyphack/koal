@@ -7,11 +7,12 @@ import (
 )
 
 type Config struct {
-	allowedOrigin string `mapstructure:"ALLOWED_ORIGIN"`
-	postgresUri   string `mapstructure:"POSTGRES_URI"`
-	jwtSecret     string `mapstructure:"JWT_SECRET"`
-	debug         bool   `mapstructure:"DEBUG"`
-	sentryDSN     string `mapstructure:"SENTRY_DSN"`
+	AllowedOrigin string `mapstructure:"ALLOWED_ORIGIN"`
+	PostgresUri   string `mapstructure:"POSTGRES_URI"`
+	JwtSecret     string `mapstructure:"JWT_SECRET"`
+	Debug         bool   `mapstructure:"DEBUG"`
+	SentryDSN     string `mapstructure:"SENTRY_DSN"`
+	Port          int    `mapstructure:"PORT"`
 }
 
 func InitConfig() {
@@ -25,7 +26,7 @@ func InitConfig() {
 	if err != nil {
 		panic(fmt.Errorf("Fatal error config file: %w \n", err))
 	}
-	
+
 	var config Config
 	err = viper.Unmarshal(&config)
 	if err != nil {

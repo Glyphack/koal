@@ -94,12 +94,13 @@ func main() {
 		log.Fatalln("Failed to register todo service", err)
 	}
 
+	gwPortStr := viper.GetString("port")
 	gwServer := &http.Server{
-		Addr:    ":8090",
+		Addr:    ":" + gwPortStr,
 		Handler: corsutils.Cors(r, corsutils.AllowOrigin),
 	}
 
-	log.Println("Serving gRPC-Gateway on http://0.0.0.0:8090")
+	log.Println("Serving gRPC-Gateway on http://0.0.0.0:" + gwPortStr)
 	log.Fatalln(gwServer.ListenAndServe())
 }
 
