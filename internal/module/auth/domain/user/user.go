@@ -39,7 +39,7 @@ func (u *User) SetPassword(password string) error {
 }
 
 func (u *User) CheckPassword(inputPassword string) bool {
-	return passwordutils.CheckPasswordHash(inputPassword, u.Password)
+	return passwordutils.IsPasswordAndHashEqual(inputPassword, u.Password)
 }
 func (u *User) GenerateToken() (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
