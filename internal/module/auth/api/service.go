@@ -28,6 +28,10 @@ func (s *server) Register(ctx context.Context, in *authv1pb.RegisterRequest) (*a
 	if err := newUser.SetPassword(in.GetPassword()); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
+	user, _ := s.userRepository.GetUser(ctx, in.GetEmail())
+	if user != nil {
+		return nil, status.Error(codes.AlreadyExists, "There is already a user with this email address")
+	}
 	err := s.userRepository.CreateUser(ctx, newUser)
 	if err != nil {
 		log.WithError(err).Error("Error while saving registered user")
