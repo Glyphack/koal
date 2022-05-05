@@ -84,7 +84,8 @@ func TestLoginValidCreds(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	resp, _ := server.Login(ctx, &authv1.LoginRequest{Email: user.Email, Password: password})
+	resp, err := server.Login(ctx, &authv1.LoginRequest{Email: user.Email, Password: password})
+	assert.Nil(t, err)
 	assert.NotEmpty(t, resp.Token)
 }
 
