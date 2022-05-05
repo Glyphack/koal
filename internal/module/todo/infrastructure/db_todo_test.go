@@ -2,6 +2,7 @@ package todoinfra_test
 
 import (
 	"context"
+	"errors"
 	"reflect"
 	"testing"
 
@@ -238,6 +239,215 @@ func (suite *Suite) Test_db_todo_CreateProject() {
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("result = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func (suite *Suite) Test_db_todo_DeleteProject() {
+	ctx := context.Background()
+	project := &todoitem.Project{
+		UUId:    uuid.MustParse("f47ac10b-58cc-0372-8567-0e02b2c3d480"),
+		OwnerId: "user1",
+		Name:    "project",
+	}
+	suite.ItemDB.CreateProject(ctx, project)
+	type args struct {
+		ctx context.Context
+		Id  string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "can delete item",
+			args: args{
+				ctx: context.Background(),
+				Id:  project.UUId.String(),
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		suite.Run(tt.name, func() {
+			t := suite.T()
+			err := suite.ItemDB.DeleteProject(tt.args.ctx, tt.args.Id)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			// after successful delete, the project should not be found
+
+			if _, err = suite.ItemDB.GetProject(tt.args.ctx, tt.args.Id); !errors.Is(err, todoinfra.NotFoundErr) {
+				t.Errorf("item is not deleted id = %v, err = %v", tt.args.Id, err)
+			}
+		})
+	}
+}
+
+func (suite *Suite) Test_db_todo_UpdateProjectById() {
+	ctx := context.Background()
+	project := &todoitem.Project{
+		UUId:    uuid.MustParse("f47ac10b-58cc-0372-8567-0e02b2c3d480"),
+		OwnerId: "user1",
+		Name:    "project",
+	}
+	suite.ItemDB.CreateProject(ctx, project)
+	type args struct {
+		ctx  context.Context
+		Id   string
+		Name string
+	}
+	tests := []struct {
+		name        string
+		args        args
+		wantProject *tododomain.ProjectInfo
+		wantErr     bool
+	}{
+		{
+			name: "can update project title",
+			args: args{
+				ctx:  context.Background(),
+				Id:   project.UUId.String(),
+				Name: "new project",
+			},
+			wantProject: &todoitem.ProjectInfo{
+				Project: &todoitem.Project{UUId: project.UUId, Name: "new project", OwnerId: project.OwnerId},
+				Items:   nil,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		suite.Run(tt.name, func() {
+			t := suite.T()
+			err := suite.ItemDB.UpdateProjectById(tt.args.ctx, tt.args.Id, tt.args.Name)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			gotProject, err := suite.ItemDB.GetProject(tt.args.ctx, tt.args.Id)
+			if err != nil {
+				t.Error(err)
+			}
+			if !reflect.DeepEqual(gotProject.Project, tt.wantProject.Project) {
+				t.Errorf("projects does not match want = %v, got = %v", tt.wantProject.Project, gotProject.Project)
+			}
+		},
+		)
+	}
+}
+
+func (suite *Suite) Test_db_todo_DeleteItem() {
+	ctx := context.Background()
+	item := &todoitem.TodoItem{
+		UUId:    uuid.MustParse("f47ac10b-58cc-0372-8567-0e02b2c3d480"),
+		Title:   "title",
+		OwnerId: "user1",
+		Project: nil,
+		IsDone:  false,
+	}
+	suite.ItemDB.CreateItem(ctx, item)
+	type args struct {
+		ctx context.Context
+		Id  string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "can delete item",
+			args: args{
+				ctx: context.Background(),
+				Id:  item.UUId.String(),
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		suite.Run(tt.name, func() {
+			t := suite.T()
+			err := suite.ItemDB.DeleteItem(tt.args.ctx, tt.args.Id)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
+			// after successful delete, the item should not be found
+
+			if _, err = suite.ItemDB.GetItemById(tt.args.ctx, tt.args.Id); !errors.Is(err, todoinfra.NotFoundErr) {
+				t.Errorf("item is not deleted id = %v, err = %v", tt.args.Id, err)
+			}
+		})
+	}
+}
+
+func (suite *Suite) Test_db_todo_AllUndoneItems() {
+	ctx := context.Background()
+
+	project := &todoitem.Project{
+		UUId:    [16]byte{},
+		Name:    "project1",
+		OwnerId: "user1",
+	}
+	doneItem := &todoitem.TodoItem{
+		UUId:    uuid.MustParse("f47ac10b-58cc-0372-8567-0e02b2c3d480"),
+		Title:   "title",
+		OwnerId: "user1",
+		Project: project,
+		IsDone:  true,
+	}
+	UndoneItem := &todoitem.TodoItem{
+		UUId:    uuid.MustParse("f47ac10b-58cc-0372-8567-0e02b2c3d480"),
+		Title:   "title",
+		OwnerId: "user1",
+		Project: project,
+		IsDone:  false,
+	}
+	suite.ItemDB.CreateProject(ctx, project)
+	suite.ItemDB.CreateItem(ctx, doneItem)
+	suite.ItemDB.CreateItem(ctx, UndoneItem)
+	type args struct {
+		ctx     context.Context
+		OwnerId string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "only returns undone items",
+			args: args{
+				ctx:     context.Background(),
+				OwnerId: doneItem.OwnerId,
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		suite.Run(tt.name, func() {
+			t := suite.T()
+			items, err := suite.ItemDB.AllUndoneItems(tt.args.ctx, tt.args.OwnerId)
+			for _, item := range items {
+				if item.IsDone {
+					t.Errorf("item is done, want undone, item = %v", item)
+				}
+			}
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+
 		})
 	}
 }

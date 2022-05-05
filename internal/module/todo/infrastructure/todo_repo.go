@@ -12,7 +12,6 @@ import (
 var NotFoundErr = errors.New("Entry does not exist")
 
 type TodoRepository interface {
-	AllItems(ctx context.Context, OwnerId string) ([]*tododomain.TodoItem, error)
 	GetItemById(ctx context.Context, Id string) (*tododomain.TodoItem, error)
 	AllUndoneItems(ctx context.Context, ownerId string) ([]*tododomain.TodoItem, error)
 	CreateItem(ctx context.Context, newItem *tododomain.TodoItem) error

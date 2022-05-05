@@ -2,6 +2,7 @@ package todoinfra
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/glyphack/koal/ent"
 	"github.com/glyphack/koal/ent/project"
@@ -39,7 +40,7 @@ func (i ItemDB) DeleteItem(ctx context.Context, ID string) error {
 	itemUUID, _ := uuid.Parse(ID)
 	_, err := i.ItemClient.Delete().Where(todoitem.UUID(itemUUID)).Exec(ctx)
 	if ent.IsNotFound(err) {
-		return NotFoundErr
+		return fmt.Errorf("%w", NotFoundErr)
 	}
 	if err != nil {
 		return err
@@ -91,37 +92,12 @@ func (i ItemDB) UpdateItem(ctx context.Context, Id string, updatedItem *tododoma
 	}
 	_, err = i.ItemClient.Update().Where(todoitem.UUID(itemUUID)).SetTitle(updatedItem.Title).SetIsDone(updatedItem.IsDone).Save(ctx)
 	if ent.IsNotFound(err) {
-		return NotFoundErr
+		return fmt.Errorf("%w", NotFoundErr)
 	}
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-func (i ItemDB) AllItems(ctx context.Context, OwnerId string) ([]*tododomain.TodoItem, error) {
-	dbItems, err := i.ItemClient.Query().Where(todoitem.OwnerID(OwnerId)).WithProject().All(ctx)
-	if ent.IsNotFound(err) {
-		return nil, NotFoundErr
-	}
-	if err != nil {
-		return nil, err
-	}
-	var items []*tododomain.TodoItem
-	for _, item := range dbItems {
-		items = append(items, &tododomain.TodoItem{
-			UUId:    item.UUID,
-			Title:   item.Title,
-			OwnerId: item.OwnerID,
-			Project: &tododomain.Project{
-				UUId:    item.Edges.Project.UUID,
-				Name:    item.Edges.Project.Name,
-				OwnerId: item.Edges.Project.OwnerID,
-			},
-			IsDone: item.IsDone,
-		})
-	}
-	return items, nil
 }
 
 func (i ItemDB) AllUndoneItems(ctx context.Context, ownerId string) ([]*tododomain.TodoItem, error) {
@@ -214,7 +190,7 @@ func (i ItemDB) DeleteProject(ctx context.Context, ID string) error {
 	projectUUID, _ := uuid.Parse(ID)
 	_, err := i.ProjectClient.Delete().Where(project.UUID(projectUUID)).Exec(ctx)
 	if ent.IsNotFound(err) {
-		return NotFoundErr
+		return fmt.Errorf("%w", NotFoundErr)
 	}
 	if err != nil {
 		return err
@@ -226,7 +202,7 @@ func (i ItemDB) UpdateProjectById(ctx context.Context, ID string, name string) e
 	projectUUID, _ := uuid.Parse(ID)
 	err := i.ProjectClient.Update().SetName(name).Where(project.UUID(projectUUID)).Exec(ctx)
 	if ent.IsNotFound(err) {
-		return NotFoundErr
+		return fmt.Errorf("%w", NotFoundErr)
 	}
 	if err != nil {
 		return err

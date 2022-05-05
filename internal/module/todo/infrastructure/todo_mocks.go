@@ -19,9 +19,6 @@ var _ TodoRepository = &TodoRepositoryMock{}
 //
 // 		// make and configure a mocked TodoRepository
 // 		mockedTodoRepository := &TodoRepositoryMock{
-// 			AllItemsFunc: func(ctx context.Context, OwnerId string) ([]*tododomain.TodoItem, error) {
-// 				panic("mock out the AllItems method")
-// 			},
 // 			AllUndoneItemsFunc: func(ctx context.Context, ownerId string) ([]*tododomain.TodoItem, error) {
 // 				panic("mock out the AllUndoneItems method")
 // 			},
@@ -59,9 +56,6 @@ var _ TodoRepository = &TodoRepositoryMock{}
 //
 // 	}
 type TodoRepositoryMock struct {
-	// AllItemsFunc mocks the AllItems method.
-	AllItemsFunc func(ctx context.Context, OwnerId string) ([]*tododomain.TodoItem, error)
-
 	// AllUndoneItemsFunc mocks the AllUndoneItems method.
 	AllUndoneItemsFunc func(ctx context.Context, ownerId string) ([]*tododomain.TodoItem, error)
 
@@ -94,13 +88,6 @@ type TodoRepositoryMock struct {
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// AllItems holds details about calls to the AllItems method.
-		AllItems []struct {
-			// Ctx is the ctx argument value.
-			Ctx context.Context
-			// OwnerId is the OwnerId argument value.
-			OwnerId string
-		}
 		// AllUndoneItems holds details about calls to the AllUndoneItems method.
 		AllUndoneItems []struct {
 			// Ctx is the ctx argument value.
@@ -176,7 +163,6 @@ type TodoRepositoryMock struct {
 			Name string
 		}
 	}
-	lockAllItems             sync.RWMutex
 	lockAllUndoneItems       sync.RWMutex
 	lockCreateItem           sync.RWMutex
 	lockCreateProject        sync.RWMutex
@@ -187,41 +173,6 @@ type TodoRepositoryMock struct {
 	lockGetProject           sync.RWMutex
 	lockUpdateItem           sync.RWMutex
 	lockUpdateProjectById    sync.RWMutex
-}
-
-// AllItems calls AllItemsFunc.
-func (mock *TodoRepositoryMock) AllItems(ctx context.Context, OwnerId string) ([]*tododomain.TodoItem, error) {
-	if mock.AllItemsFunc == nil {
-		panic("TodoRepositoryMock.AllItemsFunc: method is nil but TodoRepository.AllItems was just called")
-	}
-	callInfo := struct {
-		Ctx     context.Context
-		OwnerId string
-	}{
-		Ctx:     ctx,
-		OwnerId: OwnerId,
-	}
-	mock.lockAllItems.Lock()
-	mock.calls.AllItems = append(mock.calls.AllItems, callInfo)
-	mock.lockAllItems.Unlock()
-	return mock.AllItemsFunc(ctx, OwnerId)
-}
-
-// AllItemsCalls gets all the calls that were made to AllItems.
-// Check the length with:
-//     len(mockedTodoRepository.AllItemsCalls())
-func (mock *TodoRepositoryMock) AllItemsCalls() []struct {
-	Ctx     context.Context
-	OwnerId string
-} {
-	var calls []struct {
-		Ctx     context.Context
-		OwnerId string
-	}
-	mock.lockAllItems.RLock()
-	calls = mock.calls.AllItems
-	mock.lockAllItems.RUnlock()
-	return calls
 }
 
 // AllUndoneItems calls AllUndoneItemsFunc.
