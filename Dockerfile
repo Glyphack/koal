@@ -1,4 +1,4 @@
-FROM golang:1.17-alpine
+FROM golang:1.17-alpine AS buildenv
 
 RUN apk add --no-cache git make build-base
 
@@ -9,6 +9,12 @@ COPY go.sum .
 RUN go mod download
 
 COPY . .
-RUN go build -o ./out/koal ./cmd/main.go
+RUN GOOS=linux GOARCH=amd64 go build -o /koal/bin ./cmd/main.go
 
-CMD ["./out/koal"]
+FROM alpine
+
+WORKDIR /
+
+COPY --from=buildenv  /koal/bin /koal/bin
+
+CMD ["/koal-bin"]
