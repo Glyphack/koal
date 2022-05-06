@@ -9,12 +9,13 @@ COPY go.sum .
 RUN go mod download
 
 COPY . .
-RUN GOOS=linux GOARCH=amd64 go build -o /koal/bin ./cmd/main.go
+RUN GOOS=linux GOARCH=amd64 go build -o ./bin ./cmd/main.go
 
 FROM alpine
 
-WORKDIR /
+WORKDIR /app/koal
 
-COPY --from=buildenv  /koal/bin /koal/bin
+COPY ./config.env ./
+COPY --from=buildenv  /app/koal/bin ./bin
 
-CMD ["/koal-bin"]
+CMD ["./bin"]
