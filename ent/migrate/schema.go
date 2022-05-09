@@ -42,7 +42,7 @@ var (
 				Symbol:     "todo_items_projects_items",
 				Columns:    []*schema.Column{TodoItemsColumns[6]},
 				RefColumns: []*schema.Column{ProjectsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}

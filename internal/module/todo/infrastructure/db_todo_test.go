@@ -251,6 +251,14 @@ func (suite *Suite) Test_db_todo_DeleteProject() {
 		Name:    "project",
 	}
 	suite.ItemDB.CreateProject(ctx, project)
+	item := &todoitem.TodoItem{
+		UUId:    uuid.MustParse("f47ac10b-58cc-0372-8567-0e02b2c3d481"),
+		Title:   "title",
+		OwnerId: "user1",
+		Project: project,
+		IsDone:  false,
+	}
+	suite.ItemDB.CreateItem(ctx, item)
 	type args struct {
 		ctx context.Context
 		Id  string
@@ -261,7 +269,7 @@ func (suite *Suite) Test_db_todo_DeleteProject() {
 		wantErr bool
 	}{
 		{
-			name: "can delete item",
+			name: "can delete project",
 			args: args{
 				ctx: context.Background(),
 				Id:  project.UUId.String(),
@@ -284,6 +292,13 @@ func (suite *Suite) Test_db_todo_DeleteProject() {
 			if _, err = suite.ItemDB.GetProject(tt.args.ctx, tt.args.Id); !errors.Is(err, todoinfra.NotFoundErr) {
 				t.Errorf("item is not deleted id = %v, err = %v", tt.args.Id, err)
 			}
+
+			// after successful delete, the project items should not exist
+
+			if _, err = suite.ItemDB.GetItemById(tt.args.ctx, item.UUId.String()); !errors.Is(err, todoinfra.NotFoundErr) {
+				t.Errorf("item is not deleted id = %v, err = %v", tt.args.Id, err)
+			}
+
 		})
 	}
 }
