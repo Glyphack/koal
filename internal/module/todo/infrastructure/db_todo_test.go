@@ -297,7 +297,7 @@ func (suite *Suite) Test_db_todo_DeleteProject() {
 
 			// after successful delete, the project items should not exist
 			for _, item := range tt.args.projectInfo.Items {
-G				if _, err = suite.ItemDB.GetItemById(tt.args.ctx, item.UUId.String()); !errors.Is(err, todoinfra.NotFoundErr) {
+				if _, err = suite.ItemDB.GetItemById(tt.args.ctx, item.UUId.String()); !errors.Is(err, todoinfra.NotFoundErr) {
 					t.Errorf("item is not deleted id = %v, err = %v", item.UUId.String(), err)
 				}
 			}
