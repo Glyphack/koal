@@ -16,6 +16,7 @@ FROM alpine
 WORKDIR /app/koal
 
 COPY ./config.env ./
+COPY ./api-docs ./api-docs
 COPY --from=buildenv  /app/koal/bin ./bin
-
+EXPOSE 8090
 CMD ["./bin"]
