@@ -195,7 +195,6 @@ func (i ItemDB) DeleteProject(ctx context.Context, ID string) error {
 		return err
 	}
 	txClient := tx.Client()
-	// Use the "Gen" below, but
 	_, err = txClient.Project.Delete().Where(project.UUID(projectUUID)).Exec(ctx)
 	if ent.IsNotFound(err) {
 		return entutils.Rollback(tx, NotFoundErr)
