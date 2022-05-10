@@ -31,6 +31,7 @@ func (suite *TodoUseCaseSuite) SetupTest() {
 	suite.TodoRepository = todoinfra.ItemDB{
 		ProjectClient: client.Project,
 		ItemClient:    client.TodoItem,
+		Client: client,
 	}
 }
 

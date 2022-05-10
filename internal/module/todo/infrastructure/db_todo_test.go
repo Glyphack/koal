@@ -32,6 +32,7 @@ func (suite *Suite) SetupTest() {
 	suite.ItemDB = todoinfra.ItemDB{
 		ProjectClient: client.Project,
 		ItemClient:    client.TodoItem,
+		Client:        client,
 	}
 }
 
@@ -479,6 +480,7 @@ func TestItemDB_AllProjects(t *testing.T) {
 	}
 	itemDb := todoinfra.ItemDB{
 		ProjectClient: client.Project,
+		Client:        client,
 	}
 	projects, err := itemDb.GetAllMemberProjects(ctx, project.OwnerID)
 	if err != nil {
@@ -494,7 +496,7 @@ func TestItemDB_CreateItem(t *testing.T) {
 
 	project := client.Project.Create().SetOwnerID("test").SetName("project").SaveX(ctx)
 
-	todoRepo := todoinfra.ItemDB{ItemClient: client.TodoItem, ProjectClient: client.Project}
+	todoRepo := todoinfra.ItemDB{ItemClient: client.TodoItem, ProjectClient: client.Project, Client: client}
 	err := todoRepo.CreateItem(ctx, &todoitem.TodoItem{
 		UUId:    uuid.UUID{},
 		Title:   "new task",

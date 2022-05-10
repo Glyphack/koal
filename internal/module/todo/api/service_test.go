@@ -37,6 +37,7 @@ func (suite *Suite) SetupTest() {
 	suite.TodoRepository = todoinfra.ItemDB{
 		ProjectClient: client.Project,
 		ItemClient:    client.TodoItem,
+		Client:        client,
 	}
 }
 
@@ -624,11 +625,11 @@ func TestServer_CreateTodoItem(t *testing.T) {
 	ownerId := "Sh"
 	ctx := testutils.GetAuthenticatedContext(context.Background(), ownerId)
 	project := client.Project.Create().SetOwnerID(ownerId).SetName("testProj1").SaveX(ctx)
-request :=&todov1.CreateTodoItemRequest{
-	ProjectId: project.UUID.String(),
-	Title:     "new task",
-} 
-	response, err := server.CreateTodoItem(ctx,request)
+	request := &todov1.CreateTodoItemRequest{
+		ProjectId: project.UUID.String(),
+		Title:     "new task",
+	}
+	response, err := server.CreateTodoItem(ctx, request)
 	assert.Nil(t, err)
 	assert.Equal(t, response.GetCreatedItem().GetTitle(), request.Title)
 }

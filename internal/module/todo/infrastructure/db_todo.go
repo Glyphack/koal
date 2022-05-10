@@ -8,12 +8,14 @@ import (
 	"github.com/glyphack/koal/ent/project"
 	"github.com/glyphack/koal/ent/todoitem"
 	tododomain "github.com/glyphack/koal/internal/module/todo/domain/todo"
+	"github.com/glyphack/koal/pkg/entutils"
 	"github.com/google/uuid"
 )
 
 type ItemDB struct {
 	ProjectClient *ent.ProjectClient
 	ItemClient    *ent.TodoItemClient
+	Client        *ent.Client
 }
 
 func (i ItemDB) CreateItem(ctx context.Context, newItem *tododomain.TodoItem) error {
@@ -161,7 +163,7 @@ func (i ItemDB) GetProject(ctx context.Context, ID string) (*tododomain.ProjectI
 			Title:   item.Title,
 			OwnerId: item.OwnerID,
 			Project: domainProject,
-			IsDone: item.IsDone,
+			IsDone:  item.IsDone,
 		})
 	}
 	return &tododomain.ProjectInfo{
@@ -188,14 +190,24 @@ func (i ItemDB) GetAllMemberProjects(ctx context.Context, OwnerId string) ([]*to
 
 func (i ItemDB) DeleteProject(ctx context.Context, ID string) error {
 	projectUUID, _ := uuid.Parse(ID)
-	_, err := i.ProjectClient.Delete().Where(project.UUID(projectUUID)).Exec(ctx)
-	if ent.IsNotFound(err) {
-		return fmt.Errorf("%w", NotFoundErr)
-	}
+	tx, err := i.Client.Tx(ctx)
 	if err != nil {
 		return err
 	}
-	return nil
+	txClient := tx.Client()
+	// Use the "Gen" below, but
+	_, err = txClient.Project.Delete().Where(project.UUID(projectUUID)).Exec(ctx)
+	if ent.IsNotFound(err) {
+		return entutils.Rollback(tx, NotFoundErr)
+	}
+	if err != nil {
+		return entutils.Rollback(tx, err)
+	}
+	_, err = txClient.TodoItem.Delete().Where(todoitem.HasProjectWith(project.UUID(projectUUID))).Exec(ctx)
+	if err != nil {
+		return entutils.Rollback(tx, err)
+	}
+	return tx.Commit()
 }
 
 func (i ItemDB) UpdateProjectById(ctx context.Context, ID string, name string) error {

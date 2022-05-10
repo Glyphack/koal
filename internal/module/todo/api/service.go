@@ -172,7 +172,7 @@ func (s server) GetUndoneList(ctx context.Context, _ *emptypb.Empty) (*todov1.Ge
 }
 
 func NewServer(dbConnection *ent.Client) *server {
-	itemRepo := &todoinfra.ItemDB{ItemClient: dbConnection.TodoItem, ProjectClient: dbConnection.Project}
+	itemRepo := &todoinfra.ItemDB{ItemClient: dbConnection.TodoItem, ProjectClient: dbConnection.Project, Client: dbConnection}
 	return &server{
 		itemRepository:    itemRepo,
 		useCaseInteractor: todousecase.TodoUseCase{TodoRepository: itemRepo},
