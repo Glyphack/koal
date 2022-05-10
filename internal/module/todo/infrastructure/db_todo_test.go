@@ -260,8 +260,8 @@ func (suite *Suite) Test_db_todo_DeleteProject() {
 	}
 	suite.ItemDB.CreateItem(ctx, item)
 	type args struct {
-		ctx context.Context
-		Id  string
+		ctx         context.Context
+		projectInfo *tododomain.ProjectInfo
 	}
 	tests := []struct {
 		name    string
@@ -272,7 +272,10 @@ func (suite *Suite) Test_db_todo_DeleteProject() {
 			name: "can delete project",
 			args: args{
 				ctx: context.Background(),
-				Id:  project.UUId.String(),
+				projectInfo: &todoitem.ProjectInfo{
+					Project: project,
+					Items:   []*todoitem.TodoItem{item},
+				},
 			},
 			wantErr: false,
 		},
@@ -280,7 +283,7 @@ func (suite *Suite) Test_db_todo_DeleteProject() {
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {
 			t := suite.T()
-			err := suite.ItemDB.DeleteProject(tt.args.ctx, tt.args.Id)
+			err := suite.ItemDB.DeleteProject(tt.args.ctx, tt.args.projectInfo.Project.UUId.String())
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("error = %v, wantErr %v", err, tt.wantErr)
@@ -288,17 +291,16 @@ func (suite *Suite) Test_db_todo_DeleteProject() {
 			}
 
 			// after successful delete, the project should not be found
-
-			if _, err = suite.ItemDB.GetProject(tt.args.ctx, tt.args.Id); !errors.Is(err, todoinfra.NotFoundErr) {
-				t.Errorf("item is not deleted id = %v, err = %v", tt.args.Id, err)
+			if _, err = suite.ItemDB.GetProject(tt.args.ctx, tt.args.projectInfo.Project.UUId.String()); !errors.Is(err, todoinfra.NotFoundErr) {
+				t.Errorf("project is not deleted id = %v, err = %v", tt.args.projectInfo.Project.UUId, err)
 			}
 
 			// after successful delete, the project items should not exist
-
-			if _, err = suite.ItemDB.GetItemById(tt.args.ctx, item.UUId.String()); !errors.Is(err, todoinfra.NotFoundErr) {
-				t.Errorf("item is not deleted id = %v, err = %v", tt.args.Id, err)
+			for _, item := range tt.args.projectInfo.Items {
+G				if _, err = suite.ItemDB.GetItemById(tt.args.ctx, item.UUId.String()); !errors.Is(err, todoinfra.NotFoundErr) {
+					t.Errorf("item is not deleted id = %v, err = %v", item.UUId.String(), err)
+				}
 			}
-
 		})
 	}
 }
