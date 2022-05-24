@@ -36,7 +36,7 @@ func (suite *Suite) SetupTest() {
 	}
 }
 
-func TestTodoUseCase(t *testing.T) {
+func TestTodoDB(t *testing.T) {
 	suite.Run(t, new(Suite))
 }
 

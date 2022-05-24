@@ -145,6 +145,7 @@ func (i ItemDB) GetProject(ctx context.Context, ID string) (*tododomain.ProjectI
 	projectUUID, _ := uuid.Parse(ID)
 	dbProject, err := i.ProjectClient.Query().Where(
 		project.UUID(projectUUID)).WithItems().First(ctx)
+
 	if ent.IsNotFound(err) {
 		return nil, NotFoundErr
 	}
@@ -152,7 +153,11 @@ func (i ItemDB) GetProject(ctx context.Context, ID string) (*tododomain.ProjectI
 		return nil, err
 	}
 	var items []*tododomain.TodoItem
-	dbItems := dbProject.Edges.Items
+	dbItems, err := i.ItemClient.Query().Where(todoitem.HasProjectWith(project.UUID(projectUUID))).Order(ent.Desc(todoitem.FieldCreatedAt)).All(ctx)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get project items: %w", err)
+	}
 	domainProject := &tododomain.Project{
 		UUId:    dbProject.UUID,
 		Name:    dbProject.Name,
