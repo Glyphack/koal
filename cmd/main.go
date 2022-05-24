@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	sentryhttp "github.com/getsentry/sentry-go/http"
+
 	"github.com/getsentry/sentry-go"
 	todov1 "github.com/glyphack/koal/gen/proto/go/todo/v1"
 	todoapi "github.com/glyphack/koal/internal/module/todo/api"
@@ -95,9 +97,11 @@ func main() {
 	}
 
 	gwPortStr := viper.GetString("port")
+
+	handler := sentryhttp.New(sentryhttp.Options{}).Handle(r)
 	gwServer := &http.Server{
 		Addr:    ":" + gwPortStr,
-		Handler: corsutils.Cors(r, corsutils.AllowOrigin),
+		Handler: corsutils.Cors(handler, corsutils.AllowOrigin),
 	}
 
 	log.Println("Serving gRPC-Gateway on http://0.0.0.0:" + gwPortStr)
