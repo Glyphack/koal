@@ -2,7 +2,7 @@ module github.com/glyphack/koal
 
 go 1.17
 
-require google.golang.org/grpc v1.45.0
+require google.golang.org/grpc v1.46.2
 
 require (
 	entgo.io/ent v0.9.1
@@ -20,7 +20,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.2
 	github.com/stretchr/testify v1.7.0
-	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa
+	google.golang.org/genproto v0.0.0-20220525015930-6ca3db687a9d
 	google.golang.org/protobuf v1.28.0
 )
 

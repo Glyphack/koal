@@ -11,6 +11,7 @@ import (
 	todoinfra "github.com/glyphack/koal/internal/module/todo/infrastructure"
 	todousecase "github.com/glyphack/koal/internal/module/todo/usecase"
 	"github.com/google/uuid"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -154,7 +155,12 @@ func (s server) GetUndoneList(ctx context.Context, _ *emptypb.Empty) (*todov1.Ge
 	ownerId := fmt.Sprint(ctx.Value("userId"))
 	items, err := s.itemRepository.AllUndoneItems(ctx, ownerId)
 	if err != nil {
-		return nil, status.Error(codes.Internal, "Cannot retrieve items")
+		st := status.New(codes.Internal, "Cannot retrieve items")
+		st, _ = st.WithDetails(&errdetails.DebugInfo{
+			StackEntries: []string{err.Error()},
+			Detail:       "",
+		})
+		return nil, st.Err()
 	}
 	var undoneItems []*todov1.TodoItem
 	for _, item := range items {

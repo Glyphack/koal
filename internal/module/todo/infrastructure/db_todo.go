@@ -112,13 +112,13 @@ func (i ItemDB) AllUndoneItems(ctx context.Context, ownerId string) ([]*tododoma
 		return nil, NotFoundErr
 	}
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot query undone items: %w", err)
 	}
 	var items []*tododomain.TodoItem
 	for _, dbItem := range dbUndoneItems {
 		itemProject, err := dbItem.QueryProject().First(ctx)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("cannot load item project: %w", err) 
 		}
 		items = append(items, &tododomain.TodoItem{
 			Title:   dbItem.Title,

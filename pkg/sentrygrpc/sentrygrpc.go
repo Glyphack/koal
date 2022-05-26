@@ -3,8 +3,11 @@ package sentrygrpc
 import (
 	"context"
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/getsentry/sentry-go"
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -49,9 +52,23 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 			if ok {
 				hub.Scope().SetExtra("grpc.code", statusError.Code())
 				hub.CaptureMessage(statusError.Message())
+
+				// enrich the error message with breadcrumbs
+				for _, detail := range statusError.Details() {
+					switch t := detail.(type) {
+					case *errdetails.DebugInfo:
+						hub.AddBreadcrumb(&sentry.Breadcrumb{
+							Type:      "debug",
+							Category:  "server",
+							Message:   t.Detail,
+							Data:      map[string]interface{}{"stackTrace": strings.Join(t.GetStackEntries(), "")},
+							Level:     "error",
+							Timestamp: time.Time{},
+						}, &sentry.BreadcrumbHint{})
+					}
+				}
 			} else {
-				hub.CaptureException(err)
-				hub.CaptureMessage("handler error is not compatible with status package")
+				hub.CaptureMessage(fmt.Sprintf("handler error is not compatible with status package: %s", err))
 			}
 		}
 		return resp, err
