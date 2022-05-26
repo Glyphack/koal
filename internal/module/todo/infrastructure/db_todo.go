@@ -106,7 +106,8 @@ func (i ItemDB) AllUndoneItems(ctx context.Context, ownerId string) ([]*tododoma
 	dbUndoneItems, err := i.ItemClient.Query().Where(
 		todoitem.OwnerID(ownerId),
 		todoitem.IsDone(false),
-	).All(ctx)
+	).Order(ent.Asc(todoitem.FieldIsDone), ent.Desc(todoitem.FieldCreatedAt)).All(ctx)
+
 	if ent.IsNotFound(err) {
 		return nil, NotFoundErr
 	}
@@ -153,7 +154,9 @@ func (i ItemDB) GetProject(ctx context.Context, ID string) (*tododomain.ProjectI
 		return nil, err
 	}
 	var items []*tododomain.TodoItem
-	dbItems, err := i.ItemClient.Query().Where(todoitem.HasProjectWith(project.UUID(projectUUID))).Order(ent.Desc(todoitem.FieldCreatedAt)).All(ctx)
+	dbItems, err := i.ItemClient.Query().Where(todoitem.HasProjectWith(project.UUID(projectUUID))).Order(
+		ent.Asc(todoitem.FieldIsDone), ent.Desc(todoitem.FieldCreatedAt),
+	).All(ctx)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to get project items: %w", err)
