@@ -1,4 +1,3 @@
-/* eslint-disable import/export */
 import { cleanup, render } from '@testing-library/react'
 import { ReactElement } from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
