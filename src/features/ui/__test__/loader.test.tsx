@@ -9,7 +9,7 @@ describe('Loader', () => {
 	})
 
 	test('renders loader', () => {
-		render(<Loader loading={true} />)
+		render(<Loader />)
 		const loader = screen.getByTestId('loader')
 		expect(loader).toBeInTheDocument()
 	})
