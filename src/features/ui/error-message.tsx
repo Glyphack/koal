@@ -12,5 +12,5 @@ export function ErrorMessage({ error }: ErrorMessageProps) {
 	if (!message && error instanceof Error) message = error.message
 	if (!message) return null
 
-	return <p>{message}</p>
+	return <p data-testid="error-message">{message}</p>
 }
