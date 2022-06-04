@@ -1,13 +1,32 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { RequireAuth } from '../features/auth'
+import { ProjectsPage } from '../pages/projects'
 import { SignInPage } from '../pages/sign-in'
 import { SignUpPage } from '../pages/sign-up'
+
+const publicRoutes = [
+	{ path: '/sign-up', element: <SignUpPage /> },
+	{ path: '/sign-in', element: <SignInPage /> },
+]
+const publicRouter = publicRoutes.map((route) => (
+	<Route key={route.path} path={route.path} element={route.element} />
+))
+
+const privateRoutes = [{ path: '/project', element: <ProjectsPage /> }]
+const privateRouter = privateRoutes.map((route) => (
+	<Route
+		key={route.path}
+		path={route.path}
+		element={<RequireAuth>{route.element}</RequireAuth>}
+	/>
+))
 
 export function Router() {
 	return (
 		<Routes>
-			<Route path="/sign-up" element={<SignUpPage />} />
-			<Route path="/sign-in" element={<SignInPage />} />
-			<Route index element={<Navigate to="/sign-in" />} />
+			{publicRouter}
+			{privateRouter}
+			<Route index element={<Navigate to="/project" />} />
 		</Routes>
 	)
 }
