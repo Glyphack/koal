@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie'
-import { privateRequest } from './api'
+import { privateRequest } from '../api'
 
 describe('API', () => {
 	test('should add authorization header for private requests', async () => {

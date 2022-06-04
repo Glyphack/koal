@@ -1,5 +1,5 @@
-import { render, screen } from '../test/test-utils'
-import { SignInPage } from './sign-in'
+import { render, screen } from '../../test/test-utils'
+import { SignInPage } from '../sign-in'
 
 describe('SignInPage', () => {
 	test('should be able to sign in', async () => {
