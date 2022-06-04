@@ -4,7 +4,7 @@ import create from 'zustand'
 interface AuthState {
 	isAuthenticated: boolean
 	authenticate: (token: string) => void
-	logout: () => void
+	signOut: () => void
 }
 
 export const useAuth = create<AuthState>((set) => ({
@@ -13,7 +13,7 @@ export const useAuth = create<AuthState>((set) => ({
 		Cookies.set('token', token)
 		set({ isAuthenticated: true })
 	},
-	logout: () => {
+	signOut: () => {
 		Cookies.remove('token')
 		set({ isAuthenticated: false })
 	},
