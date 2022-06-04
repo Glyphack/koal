@@ -1,4 +1,3 @@
-import { test } from 'vitest'
 import { render, screen } from '../test/test-utils'
 import { SignUpPage } from './sign-up'
 
@@ -11,6 +10,13 @@ describe('SignUpPage', () => {
 		user.type(emailField, 'test@email.com')
 		user.type(passwordField, 'password')
 		await user.click(signUpButton)
-		await screen.findByText(/submitting/i)
+		expect(signUpButton).toBeDisabled()
+		await screen.findByText(/loading/i)
+	})
+
+	test('should have sign in link', async () => {
+		render(<SignUpPage />)
+		const signInLink = screen.getByRole('link', { name: /sign in/i })
+		expect(signInLink).toBeInTheDocument()
 	})
 })
