@@ -16,3 +16,15 @@ export interface SignInRequest {
 	email: string
 	password: string
 }
+
+export interface SignInResponse {
+	token: string
+}
+
+export interface FetchProjectsResponse {
+	projects: { id: string; name: string }[]
+}
+
+export interface CreateProjectRequest {
+	name: string
+}
