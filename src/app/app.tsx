@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { BrowserRouter } from 'react-router-dom'
 import { Layout } from './layout'
-import { Router } from './routes'
+import { Router } from './router'
 
 const client = new QueryClient()
 
