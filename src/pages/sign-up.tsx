@@ -1,9 +1,8 @@
 import { useForm } from 'react-hook-form'
 import { useMutation } from 'react-query'
-import { Link } from 'react-router-dom'
 import { api } from '../api'
 import { useAuthorize } from '../features/auth'
-import { ErrorMessage, Field, Loader } from '../features/ui'
+import { Button, ErrorMessage, Field, Link, Loader } from '../features/ui'
 
 export function SignUpPage() {
 	const authorize = useAuthorize()
@@ -21,9 +20,9 @@ export function SignUpPage() {
 			<form onSubmit={signUp}>
 				<Field type="text" placeholder="Email" {...form.register('email')} />
 				<Field type="password" placeholder="Password" {...form.register('password')} />
-				<button type="submit" disabled={signUpMutation.isLoading}>
+				<Button type="submit" disabled={signUpMutation.isLoading}>
 					Sign Up
-				</button>
+				</Button>
 				<Loader loading={signUpMutation.isLoading} />
 			</form>
 			<ErrorMessage error={signUpMutation.error} />
