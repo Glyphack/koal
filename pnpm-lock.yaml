@@ -6,6 +6,7 @@ specifiers:
   '@testing-library/react': ^13.3.0
   '@testing-library/react-hooks': ^8.0.0
   '@testing-library/user-event': ^14.2.0
+  '@types/js-cookie': ^3.0.2
   '@types/react': ^18.0.10
   '@types/react-dom': ^18.0.5
   '@types/testing-library__jest-dom': ^5.14.3
@@ -23,6 +24,7 @@ specifiers:
   eslint-plugin-react: ^7.30.0
   eslint-plugin-react-hooks: ^4.5.0
   eslint-plugin-testing-library: ^5.5.1
+  js-cookie: ^3.0.1
   jsdom: ^19.0.0
   msw: ^0.42.0
   postcss: ^8.4.14
@@ -40,6 +42,7 @@ specifiers:
 dependencies:
   axios: 0.27.2
   clsx: 1.1.1
+  js-cookie: 3.0.1
   react: 18.1.0
   react-dom: 18.1.0_react@18.1.0
   react-hook-form: 7.31.3_react@18.1.0
@@ -52,6 +55,7 @@ devDependencies:
   '@testing-library/react': 13.3.0_ef5jwxihqo6n7gxfmzogljlgcm
   '@testing-library/react-hooks': 8.0.0_4hkwgow5356cdmtz5c5vaxngqm
   '@testing-library/user-event': 14.2.0_tlwynutqiyp5mns3woioasuxnq
+  '@types/js-cookie': 3.0.2
   '@types/react': 18.0.10
   '@types/react-dom': 18.0.5
   '@types/testing-library__jest-dom': 5.14.3
@@ -590,6 +594,10 @@ packages:
     dependencies:
       jest-matcher-utils: 27.5.1
       pretty-format: 27.5.1
+    dev: true
+
+  /@types/js-cookie/3.0.2:
+    resolution: {integrity: sha512-6+0ekgfusHftJNYpihfkMu8BWdeHs9EOJuGcSofErjstGPfPGEu9yTu4t460lTzzAMl2cM5zngQJqPMHbbnvYA==}
     dev: true
 
   /@types/js-levenshtein/1.1.1:
@@ -2444,6 +2452,11 @@ packages:
       jest-get-type: 27.5.1
       pretty-format: 27.5.1
     dev: true
+
+  /js-cookie/3.0.1:
+    resolution: {integrity: sha512-+0rgsUXZu4ncpPxRL+lNEptWMOWl9etvPHc/koSRp6MPwpRYAhmk0dUG00J4bxVV3r9uUzfo24wW0knS07SKSw==}
+    engines: {node: '>=12'}
+    dev: false
 
   /js-levenshtein/1.1.6:
     resolution: {integrity: sha512-X2BB11YZtrRqY4EnQcLX5Rh373zbK4alC1FW7D7MBhL2gtcC17cTnr6DmfHZeS0s2rTHjUTMMHfG7gO8SSdw+g==}
