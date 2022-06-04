@@ -1,16 +1,18 @@
 import { useForm } from 'react-hook-form'
 import { useMutation } from 'react-query'
+import { useNavigate } from 'react-router-dom'
 import { api } from '../api'
-import { useAuthorize } from '../features/auth'
+import { useAuth } from '../features/auth'
 import { Button, ErrorMessage, Field, Link, Loader } from '../features/ui'
 
 export function SignUpPage() {
-	const authorize = useAuthorize()
+	const navigate = useNavigate()
+	const authenticate = useAuth((state) => state.authenticate)
 	const form = useForm({ defaultValues: { email: '', password: '' } })
 	const signUpMutation = useMutation(api.signUp, {
 		onSuccess: (data) => {
-			const token = data.data.token
-			authorize(token)
+			authenticate(data.data.token)
+			navigate('/project', { replace: true })
 		},
 	})
 	const signUp = form.handleSubmit((values) => signUpMutation.mutate(values))
