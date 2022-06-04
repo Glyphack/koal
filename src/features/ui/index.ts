@@ -1,4 +1,6 @@
+export * from './button'
 export * from './error-message'
 export * from './field'
 export * from './heading'
+export * from './link'
 export * from './loader'
