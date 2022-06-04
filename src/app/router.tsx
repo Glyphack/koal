@@ -3,6 +3,7 @@ import { RequireAuth } from '../features/auth'
 import { ProjectsPage } from '../pages/projects'
 import { SignInPage } from '../pages/sign-in'
 import { SignUpPage } from '../pages/sign-up'
+import { PrivateLayout } from './private-layout'
 
 const publicRoutes = [
 	{ path: '/sign-up', element: <SignUpPage /> },
@@ -17,7 +18,11 @@ const privateRouter = privateRoutes.map((route) => (
 	<Route
 		key={route.path}
 		path={route.path}
-		element={<RequireAuth>{route.element}</RequireAuth>}
+		element={
+			<RequireAuth>
+				<PrivateLayout>{route.element}</PrivateLayout>
+			</RequireAuth>
+		}
 	/>
 ))
 
