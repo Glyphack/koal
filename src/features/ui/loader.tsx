@@ -5,5 +5,5 @@ interface LoaderProps {
 export function Loader({ loading }: LoaderProps) {
 	if (!loading) return null
 
-	return <p>Loading...</p>
+	return <p data-testid="loader">Loading...</p>
 }
