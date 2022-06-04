@@ -20,7 +20,8 @@
 		"react-dom": "^18.1.0",
 		"react-hook-form": "^7.31.3",
 		"react-query": "^3.39.1",
-		"react-router-dom": "6"
+		"react-router-dom": "6",
+		"zustand": "4.0.0-rc.1"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^8.13.0",
