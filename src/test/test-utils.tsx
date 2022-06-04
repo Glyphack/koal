@@ -2,6 +2,7 @@ import { cleanup, render } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ReactElement } from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { BrowserRouter } from 'react-router-dom'
 import { afterEach } from 'vitest'
 
 afterEach(() => cleanup())
@@ -13,7 +14,9 @@ const customRender = (ui: ReactElement, options = {}) => ({
 	...render(ui, {
 		// wrap provider(s) here if needed
 		wrapper: ({ children }) => (
-			<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+			<BrowserRouter>
+				<QueryClientProvider client={queryClient}> {children}</QueryClientProvider>
+			</BrowserRouter>
 		),
 		...options,
 	}),
