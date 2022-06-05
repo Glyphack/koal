@@ -10,7 +10,8 @@
 		"format": "prettier --write ./src",
 		"test": "vitest",
 		"test:ui": "vitest --ui",
-		"coverage": "vitest run --coverage"
+		"coverage": "vitest run --coverage",
+		"prebuild": "test \"$CI\" = true && npx pnpm install -r --store=node_modules/.pnpm-store || echo skipping pnpm install"
 	},
 	"dependencies": {
 		"axios": "^0.27.2",
