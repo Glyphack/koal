@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { RequireAuth } from '../features/auth'
+import { ProjectPage } from '../pages/project'
 import { ProjectsPage } from '../pages/projects'
 import { SignInPage } from '../pages/sign-in'
 import { SignUpPage } from '../pages/sign-up'
@@ -13,7 +14,10 @@ const publicRouter = publicRoutes.map((route) => (
 	<Route key={route.path} path={route.path} element={route.element} />
 ))
 
-const privateRoutes = [{ path: '/project', element: <ProjectsPage /> }]
+const privateRoutes = [
+	{ path: '/project', element: <ProjectsPage /> },
+	{ path: '/project/:id', element: <ProjectPage /> },
+]
 const privateRouter = privateRoutes.map((route) => (
 	<Route
 		key={route.path}
