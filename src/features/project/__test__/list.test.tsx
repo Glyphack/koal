@@ -1,3 +1,4 @@
+import { mockProject } from '../../../test/handlers'
 import { render, screen, waitFor } from '../../../test/test-utils'
 import { ProjectList } from '../list'
 
@@ -7,7 +8,7 @@ describe('ProjectList', () => {
 		const loader = screen.getByTestId('loader')
 		expect(loader).toBeInTheDocument()
 		await waitFor(() => expect(loader).not.toBeInTheDocument())
-		const project = screen.getByRole('link', { name: 'Test Project' })
+		const project = screen.getByRole('link', { name: mockProject.name })
 		expect(project).toBeInTheDocument()
 	})
 })
