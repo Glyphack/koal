@@ -7,6 +7,14 @@ import { Loader } from '../features/ui'
 
 export function ProjectPage() {
 	const { id: projectId = '' } = useParams<{ id: string }>()
+	return <ProjectDetails projectId={projectId} />
+}
+
+interface ProjectDetailsProps {
+	projectId: string
+}
+
+export function ProjectDetails({ projectId }: ProjectDetailsProps) {
 	const projectQuery = useQuery([QueryKey.Project, projectId], () => api.fetchProject(projectId))
 	const project = projectQuery.data?.data
 
