@@ -7,7 +7,6 @@ export function ProjectList() {
 	const projectsQuery = useQuery(QueryKey.Projects, api.fetchProjects)
 	if (projectsQuery.isLoading) return <Loader />
 	const projects = projectsQuery.data?.data.projects ?? []
-	if (projects.length === 0) return <div>No projects found</div>
 
 	return (
 		<div>
