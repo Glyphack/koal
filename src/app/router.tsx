@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { RequireAuth } from '../features/auth'
+import { NotFoundPage } from '../pages/404'
 import { ProjectPage } from '../pages/project'
 import { ProjectsPage } from '../pages/projects'
 import { SignInPage } from '../pages/sign-in'
@@ -36,6 +37,7 @@ export function Router() {
 			{publicRouter}
 			{privateRouter}
 			<Route index element={<Navigate to="/project" />} />
+			<Route path="*" element={<NotFoundPage />} />
 		</Routes>
 	)
 }

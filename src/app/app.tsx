@@ -3,7 +3,12 @@ import { BrowserRouter } from 'react-router-dom'
 import { Layout } from './layout'
 import { Router } from './router'
 
-const client = new QueryClient()
+const client = new QueryClient({
+	defaultOptions: {
+		queries: { retry: false, refetchOnWindowFocus: false },
+		mutations: { retry: false },
+	},
+})
 
 export function App() {
 	return (
