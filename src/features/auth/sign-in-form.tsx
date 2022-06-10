@@ -7,12 +7,15 @@ import { useAuth } from './use-auth'
 
 export function SignInForm() {
 	const navigate = useNavigate()
-	const authenticate = useAuth((state) => state.authenticate)
+	const { authenticate, triedToVisitPage } = useAuth((state) => ({
+		authenticate: state.authenticate,
+		triedToVisitPage: state.triedToVisitPage,
+	}))
 	const form = useForm({ defaultValues: { email: '', password: '' } })
 	const signInMutation = useMutation(api.signIn, {
 		onSuccess: (data) => {
 			authenticate(data.data.token)
-			navigate('/project', { replace: true })
+			navigate(triedToVisitPage || '/project', { replace: true })
 		},
 	})
 	const signIn = form.handleSubmit((values) => signInMutation.mutate(values))

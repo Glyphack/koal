@@ -11,14 +11,14 @@ const publicRoutes = [
 	{ path: '/sign-up', element: <SignUpPage /> },
 	{ path: '/sign-in', element: <SignInPage /> },
 ]
-const publicRouter = publicRoutes.map((route) => (
-	<Route key={route.path} path={route.path} element={route.element} />
-))
-
 const privateRoutes = [
 	{ path: '/project', element: <ProjectsPage /> },
 	{ path: '/project/:id', element: <ProjectPage /> },
 ]
+
+const publicRouter = publicRoutes.map((route) => (
+	<Route key={route.path} path={route.path} element={route.element} />
+))
 const privateRouter = privateRoutes.map((route) => (
 	<Route
 		key={route.path}
