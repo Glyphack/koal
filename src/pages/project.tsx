@@ -24,13 +24,19 @@ export function ProjectDetails({ projectId }: ProjectDetailsProps) {
 	if (projectQuery.isLoading || !project) return <Loader />
 
 	return (
-		<main>
-			<div>
-				<span>{project.info.name}</span>
+		<main className="space-y-20">
+			<div className="flex items-center justify-between max-w-xs">
+				<h3 className="text-3xl">{project.info.name}</h3>
 				<ProjectDeletion projectId={projectId} />
 			</div>
-			<TaskForm projectId={projectId} />
-			<TaskList tasks={project.items} />
+			<div className="flex flex-col gap-20 lg:flex-row">
+				<div className="max-w-xs grow">
+					<TaskForm projectId={projectId} />
+				</div>
+				<div className="grow">
+					<TaskList tasks={project.items} />
+				</div>
+			</div>
 		</main>
 	)
 }
