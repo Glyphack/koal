@@ -3,7 +3,7 @@ module.exports = {
 	theme: {
 		extend: {
 			fontFamily: {
-				body: ['Fredoka', 'sans-serif'],
+				body: ['Nunito', 'sans-serif'],
 			},
 		},
 	},
