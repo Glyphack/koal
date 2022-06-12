@@ -11,6 +11,6 @@ describe('SignUpForm', () => {
 		await user.type(passwordField, 'password')
 		await user.click(signUpButton)
 		expect(signUpButton).toBeDisabled()
-		await screen.findByText(/loading/i)
+		await screen.findByTestId('loader')
 	})
 })
