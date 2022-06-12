@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from 'react-query'
 import { api, QueryKey } from '../../api'
-import { Button, Field } from '../ui'
+import { Button, Field, Form } from '../ui'
 
 export function ProjectForm() {
 	const queryClient = useQueryClient()
@@ -15,11 +15,21 @@ export function ProjectForm() {
 	const createProject = form.handleSubmit((values) => mutation.mutate(values))
 
 	return (
-		<form className="space-y-4" onSubmit={createProject}>
-			<Field type="text" placeholder="Project Name" {...form.register('name')} />
-			<Button type="submit" disabled={mutation.isLoading}>
-				Add Project
-			</Button>
-		</form>
+		<Form
+			onSubmit={createProject}
+			fields={
+				<Field
+					label="Project"
+					type="text"
+					placeholder="project name"
+					{...form.register('name')}
+				/>
+			}
+			actions={
+				<Button type="submit" loading={mutation.isLoading}>
+					Add Project
+				</Button>
+			}
+		></Form>
 	)
 }
