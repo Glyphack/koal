@@ -15,7 +15,7 @@ export function ProjectForm() {
 	const createProject = form.handleSubmit((values) => mutation.mutate(values))
 
 	return (
-		<form onSubmit={createProject}>
+		<form className="space-y-4" onSubmit={createProject}>
 			<Field type="text" placeholder="Project Name" {...form.register('name')} />
 			<Button type="submit" disabled={mutation.isLoading}>
 				Add Project

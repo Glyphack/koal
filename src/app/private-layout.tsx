@@ -17,7 +17,7 @@ export function PrivateLayout({ children }: PrivateLayoutProps) {
 	}
 
 	return (
-		<div className="space-y-4">
+		<div className="space-y-10">
 			<header className="flex justify-end">
 				<Button variant="text" onClick={handleSignOut}>
 					<HiArrowSmLeft /> Sign Out

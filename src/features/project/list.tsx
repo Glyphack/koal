@@ -1,7 +1,6 @@
 import { useQuery } from 'react-query'
-import { Link } from 'react-router-dom'
 import { api, QueryKey } from '../../api'
-import { Loader } from '../ui'
+import { Link, Loader } from '../ui'
 
 export function ProjectList() {
 	const projectsQuery = useQuery(QueryKey.Projects, api.fetchProjects)
