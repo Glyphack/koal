@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { HiArrowSmLeft } from 'react-icons/hi'
 import { useQueryClient } from 'react-query'
 import { useAuth } from '../features/auth'
 import { Button } from '../features/ui'
@@ -16,9 +17,11 @@ export function PrivateLayout({ children }: PrivateLayoutProps) {
 	}
 
 	return (
-		<div>
-			<header>
-				<Button onClick={handleSignOut}>Sign Out</Button>
+		<div className="space-y-4">
+			<header className="flex justify-end">
+				<Button variant="text" onClick={handleSignOut}>
+					<HiArrowSmLeft /> Sign Out
+				</Button>
 			</header>
 			<div>{children}</div>
 		</div>
