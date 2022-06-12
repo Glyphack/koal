@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from 'react-query'
 import { api, QueryKey } from '../../api'
-import { Button, Field } from '../ui'
+import { Button, Field, Form } from '../ui'
 
 interface TaskFormProps {
 	projectId: string
@@ -21,11 +21,21 @@ export function TaskForm({ projectId }: TaskFormProps) {
 	)
 
 	return (
-		<form onSubmit={createTask}>
-			<Field type="text" placeholder="Task Name" {...taskForm.register('title')} />
-			<Button type="submit" disabled={createTaskMutation.isLoading}>
-				Add Task
-			</Button>
-		</form>
+		<Form
+			onSubmit={createTask}
+			fields={
+				<Field
+					label="Task"
+					type="text"
+					placeholder="task name"
+					{...taskForm.register('title')}
+				/>
+			}
+			actions={
+				<Button type="submit" loading={createTaskMutation.isLoading}>
+					Add Task
+				</Button>
+			}
+		></Form>
 	)
 }

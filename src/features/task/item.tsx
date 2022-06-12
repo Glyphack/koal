@@ -8,10 +8,12 @@ interface TaskItemProps {
 
 export function TaskItem({ task }: TaskItemProps) {
 	return (
-		<div>
-			<span>{task.title}</span>
-			<TaskCompletion taskId={task.id} isDone={task.isDone} />
-			<TaskDeletion taskId={task.id} />
+		<div className="flex items-center justify-between gap-10">
+			<h4>{task.title}</h4>
+			<div className="flex items-center gap-6">
+				<TaskCompletion taskId={task.id} isDone={task.isDone} />
+				<TaskDeletion taskId={task.id} />
+			</div>
 		</div>
 	)
 }

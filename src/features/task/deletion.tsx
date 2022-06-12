@@ -1,3 +1,4 @@
+import { HiOutlineTrash } from 'react-icons/hi'
 import { useMutation, useQueryClient } from 'react-query'
 import { api, QueryKey } from '../../api'
 import { Button } from '../ui'
@@ -14,8 +15,13 @@ export function TaskDeletion({ taskId }: TaskDeletionProps) {
 	const deleteTask = () => deleteTaskMutation.mutate(taskId)
 
 	return (
-		<Button type="button" onClick={deleteTask} disabled={deleteTaskMutation.isLoading}>
-			Delete
+		<Button
+			variant="icon"
+			type="button"
+			onClick={deleteTask}
+			loading={deleteTaskMutation.isLoading}
+		>
+			<HiOutlineTrash />
 		</Button>
 	)
 }

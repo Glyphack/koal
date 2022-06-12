@@ -7,7 +7,7 @@ interface TaskListProps {
 
 export function TaskList({ tasks }: TaskListProps) {
 	return (
-		<div>
+		<div className="flex flex-col gap-4">
 			{tasks.map((task) => (
 				<TaskItem key={task.id} task={task} />
 			))}
