@@ -1,3 +1,4 @@
+import { HiOutlineTrash } from 'react-icons/hi'
 import { useMutation } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../api'
@@ -15,8 +16,13 @@ export function ProjectDeletion({ projectId }: ProjectDeletionProps) {
 	const deleteProject = () => deleteProjectMutation.mutate(projectId)
 
 	return (
-		<Button type="button" onClick={deleteProject} disabled={deleteProjectMutation.isLoading}>
-			Delete Project
+		<Button
+			variant="icon"
+			type="button"
+			onClick={deleteProject}
+			disabled={deleteProjectMutation.isLoading}
+		>
+			<HiOutlineTrash />
 		</Button>
 	)
 }
