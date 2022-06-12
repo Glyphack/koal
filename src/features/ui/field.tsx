@@ -14,7 +14,7 @@ export const Field = forwardRef<HTMLInputElement, FieldProps>(({ label, ...rest 
 			)}
 			<input
 				{...rest}
-				className="p-1 transition rounded-lg outline-none bg-gray-50 focus:ring-1 ring-offset-2 ring-emerald-300 focus:bg-emerald-50"
+				className="px-2 py-1 transition rounded-lg outline-none bg-gray-50 focus:ring-1 ring-offset-2 ring-emerald-300 focus:bg-emerald-50"
 				id={rest.name}
 				ref={ref}
 			/>

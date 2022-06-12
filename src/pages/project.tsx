@@ -29,7 +29,7 @@ export function ProjectDetails({ projectId }: ProjectDetailsProps) {
 				<h3 className="text-3xl">{project.info.name}</h3>
 				<ProjectDeletion projectId={projectId} />
 			</div>
-			<div className="flex flex-col gap-20 lg:flex-row">
+			<div className="flex flex-col gap-20 lg:gap-40 lg:flex-row">
 				<div className="max-w-xs grow">
 					<TaskForm projectId={projectId} />
 				</div>
