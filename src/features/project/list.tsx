@@ -8,10 +8,12 @@ export function ProjectList() {
 	const projects = projectsQuery.data?.data.projects ?? []
 
 	return (
-		<div>
+		<div className="space-y-8">
 			{projects.map((project) => (
 				<div key={project.id}>
-					<Link to={`/project/${project.id}`}>{project.name}</Link>
+					<Link className="text-3xl font-normal" to={`/project/${project.id}`}>
+						{project.name}
+					</Link>
 				</div>
 			))}
 		</div>
