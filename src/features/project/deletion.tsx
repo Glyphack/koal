@@ -21,6 +21,7 @@ export function ProjectDeletion({ projectId }: ProjectDeletionProps) {
 			type="button"
 			onClick={deleteProject}
 			disabled={deleteProjectMutation.isLoading}
+			data-testid="project-deletion"
 		>
 			<HiOutlineTrash />
 		</Button>

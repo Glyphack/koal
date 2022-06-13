@@ -24,6 +24,7 @@ export function TaskCompletion({ taskId, isDone }: TaskCompletionProps) {
 			type="button"
 			onClick={onClick}
 			loading={updateTaskMutation.isLoading}
+			data-testid="task-completion"
 		>
 			{content}
 		</Button>

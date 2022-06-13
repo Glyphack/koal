@@ -10,7 +10,7 @@ describe('ProjectPage', () => {
 		await waitFor(() => expect(loader).not.toBeInTheDocument())
 		const projectTitle = screen.getByText(mockProject.name)
 		expect(projectTitle).toBeInTheDocument()
-		const deleteProjectButton = screen.getByRole('button', { name: /delete project/i })
+		const deleteProjectButton = screen.getByTestId('project-deletion')
 		expect(deleteProjectButton).toBeInTheDocument()
 		const addTaskButton = screen.getByRole('button', { name: /add task/i })
 		expect(addTaskButton).toBeInTheDocument()
