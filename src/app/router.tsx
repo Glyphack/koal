@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { RequireAuth } from '../features/auth'
+import { RequireAuth, RequireUnAuth } from '../features/auth'
 import { NotFoundPage } from '../pages/404'
 import { ProjectPage } from '../pages/project'
 import { ProjectsPage } from '../pages/projects'
@@ -17,7 +17,11 @@ const privateRoutes = [
 ]
 
 const publicRouter = publicRoutes.map((route) => (
-	<Route key={route.path} path={route.path} element={route.element} />
+	<Route
+		key={route.path}
+		path={route.path}
+		element={<RequireUnAuth>{route.element}</RequireUnAuth>}
+	/>
 ))
 const privateRouter = privateRoutes.map((route) => (
 	<Route
