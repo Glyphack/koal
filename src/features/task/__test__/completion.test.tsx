@@ -4,7 +4,7 @@ import { TaskCompletion } from '../completion'
 describe('TaskCompletion', () => {
 	test('should done task', async () => {
 		const { user } = render(<TaskCompletion isDone={false} taskId="1" />)
-		const doneTaskButton = screen.getByRole('button', { name: /done/i })
+		const doneTaskButton = screen.getByTestId('task-completion')
 		await user.click(doneTaskButton)
 		expect(doneTaskButton).toBeDisabled()
 		await waitFor(() => expect(doneTaskButton).toBeEnabled())
@@ -12,7 +12,7 @@ describe('TaskCompletion', () => {
 
 	test('should undone task', async () => {
 		const { user } = render(<TaskCompletion isDone={true} taskId="1" />)
-		const undoneTaskButton = screen.getByRole('button', { name: /undone/i })
+		const undoneTaskButton = screen.getByTestId('task-completion')
 		await user.click(undoneTaskButton)
 		expect(undoneTaskButton).toBeDisabled()
 		await waitFor(() => expect(undoneTaskButton).toBeEnabled())

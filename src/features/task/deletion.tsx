@@ -20,6 +20,7 @@ export function TaskDeletion({ taskId }: TaskDeletionProps) {
 			type="button"
 			onClick={deleteTask}
 			loading={deleteTaskMutation.isLoading}
+			data-testid="task-deletion"
 		>
 			<HiOutlineTrash />
 		</Button>
