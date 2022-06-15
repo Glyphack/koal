@@ -1,4 +1,4 @@
-import { HiCheck, HiX } from 'react-icons/hi'
+import { HiCheck } from 'react-icons/hi'
 import { useMutation, useQueryClient } from 'react-query'
 import { api, QueryKey } from '../../api'
 import { Button } from '../ui'
@@ -16,7 +16,7 @@ export function TaskCompletion({ taskId, isDone }: TaskCompletionProps) {
 	const checkTask = () => updateTaskMutation.mutate({ id: taskId, payload: { isDone: true } })
 	const uncheckTask = () => updateTaskMutation.mutate({ id: taskId, payload: { isDone: false } })
 	const onClick = isDone ? uncheckTask : checkTask
-	const content = isDone ? <HiX /> : <HiCheck />
+	const content = isDone ? <HiCheck /> : <span />
 
 	return (
 		<Button
@@ -26,7 +26,9 @@ export function TaskCompletion({ taskId, isDone }: TaskCompletionProps) {
 			loading={updateTaskMutation.isLoading}
 			data-testid="task-completion"
 		>
-			{content}
+			<span className="flex items-center justify-center w-4 h-4 border-2 border-gray-700 rounded-full">
+				{content}
+			</span>
 		</Button>
 	)
 }
