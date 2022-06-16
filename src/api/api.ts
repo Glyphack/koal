@@ -2,6 +2,7 @@ import { privateRequest, publicRequest } from './config'
 import {
 	CreateProjectRequest,
 	CreateTaskRequest,
+	FetchInboxResponse,
 	FetchProjectResponse,
 	FetchProjectsResponse,
 	SignInRequest,
@@ -34,6 +35,8 @@ const updateTask = ({ id, payload }: { id: string; payload: UpdateTaskRequest })
 
 const deleteTask = (id: string) => privateRequest.delete(`/todo/items/${id}`)
 
+const fetchInbox = () => privateRequest.get<FetchInboxResponse>('/todo/lists/undone')
+
 export const api = {
 	signUp,
 	signIn,
@@ -44,9 +47,11 @@ export const api = {
 	createTask,
 	updateTask,
 	deleteTask,
+	fetchInbox,
 }
 
 export enum QueryKey {
 	Projects = 'projects',
 	Project = 'project',
+	Inbox = 'inbox',
 }

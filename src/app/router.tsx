@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { RequireAuth, RequireUnAuth } from '../features/auth'
 import { NotFoundPage } from '../pages/404'
+import { InboxPage } from '../pages/inbox'
 import { ProjectPage } from '../pages/project'
 import { ProjectsPage } from '../pages/projects'
 import { SignInPage } from '../pages/sign-in'
@@ -12,6 +13,7 @@ const publicRoutes = [
 	{ path: '/sign-in', element: <SignInPage /> },
 ]
 const privateRoutes = [
+	{ path: '/inbox', element: <InboxPage /> },
 	{ path: '/project', element: <ProjectsPage /> },
 	{ path: '/project/:id', element: <ProjectPage /> },
 ]
