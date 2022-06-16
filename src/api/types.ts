@@ -44,6 +44,10 @@ export interface UpdateTaskRequest {
 	isDone?: boolean
 }
 
+export interface FetchInboxResponse {
+	items: Task[]
+}
+
 // ####################################################################################################
 
 export interface ProjectInfo {
