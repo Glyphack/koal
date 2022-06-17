@@ -14,7 +14,7 @@ describe('ProjectPage', () => {
 		expect(deleteProjectButton).toBeInTheDocument()
 		const addTaskButton = screen.getByRole('button', { name: /add task/i })
 		expect(addTaskButton).toBeInTheDocument()
-		const taskName = screen.getByText(mockTask.title)
-		expect(taskName).toBeInTheDocument()
+		const taskName = screen.getAllByTestId('task-title')[0]
+		expect(taskName).toHaveTextContent(mockTask.title)
 	})
 })
