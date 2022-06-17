@@ -5,8 +5,18 @@ const API_URL = import.meta.env.VITE_API_URL
 
 export const mockProject1 = { id: 'p1', name: 'project 1' }
 export const mockProject2 = { id: 'p2', name: 'project 2' }
-export const mockTask = { id: 't1', title: 'task 1', isDone: false, project: mockProject1 }
-export const mockDoneTask = { id: 't2', title: 'task 2', isDone: true, project: mockProject2 }
+export const mockTask = {
+	id: 't1',
+	title: 'task https://task1.com 1',
+	isDone: false,
+	project: mockProject1,
+}
+export const mockDoneTask = {
+	id: 't2',
+	title: 'task 2',
+	isDone: true,
+	project: mockProject2,
+}
 export const mockTasks = [mockTask, mockDoneTask]
 
 export const handlers = [
