@@ -4,12 +4,12 @@ import { TaskItem } from '../item'
 
 describe('TaskItem', () => {
 	test('should render task', async () => {
-		 render(<TaskItem task={mockTask} />)
-         const title = screen.getByText(mockTask.title)
-         const completion = screen.getByTestId('task-completion')
-         const deletion = screen.getByTestId('task-deletion')
-         expect(title).toBeInTheDocument()
-         expect(completion).toBeInTheDocument()
-         expect(deletion).toBeInTheDocument()
+		render(<TaskItem task={mockTask} />)
+		const title = screen.getByTestId('task-title')
+		const completion = screen.getByTestId('task-completion')
+		const deletion = screen.getByTestId('task-deletion')
+		expect(title).toHaveTextContent(mockTask.title)
+		expect(completion).toBeInTheDocument()
+		expect(deletion).toBeInTheDocument()
 	})
 })
