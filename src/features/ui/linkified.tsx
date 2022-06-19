@@ -16,10 +16,10 @@ export function Linkified({ children }: LinkifiedProps) {
 						target="_blank"
 						rel="noreferrer"
 					>
-						{word}{' '}
+						{word}
 					</a>
 				) : (
-					<span key={index}>{word} </span>
+					<span key={index}> {word} </span>
 				)
 			)}
 		</>

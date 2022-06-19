@@ -1,40 +1,49 @@
+import Cookies from 'js-cookie'
+import jwtDecode from 'jwt-decode'
 import { ReactNode } from 'react'
-import { HiArrowSmLeft } from 'react-icons/hi'
-import { useQueryClient } from 'react-query'
 import { useMatch } from 'react-router-dom'
-import { useAuth } from '../features/auth'
-import { Button, Link } from '../features/ui'
+import { SignOutButton } from '../features/auth'
+import { Link } from '../features/ui'
 
 interface PrivateLayoutProps {
 	children: ReactNode
 }
 
 export function PrivateLayout({ children }: PrivateLayoutProps) {
-	const isInProjectPage = useMatch('/project/:id')
-	const isInInboxPage = useMatch('/inbox')
-	const signOut = useAuth((state) => state.signOut)
-	const queryClient = useQueryClient()
-	const showProjectsLink = isInProjectPage || isInInboxPage
-	const handleSignOut = () => {
-		signOut()
-		queryClient.clear()
-	}
-
 	return (
 		<div className="space-y-10">
 			<header className="flex items-center justify-between gap-4">
-				<div>
-					{showProjectsLink && (
-						<Link to="/project" withLeftIcon>
-							Projects
-						</Link>
-					)}
+				<ProjectsLink />
+				<div className="flex flex-col items-end gap-1 text-right">
+					<UserEmail />
+					<SignOutButton />
 				</div>
-				<Button variant="text" onClick={handleSignOut}>
-					<HiArrowSmLeft /> Sign Out
-				</Button>
 			</header>
 			<div>{children}</div>
 		</div>
 	)
+}
+
+function ProjectsLink() {
+	const isInProjectPage = useMatch('/project/:id')
+	const isInInboxPage = useMatch('/inbox')
+	const showProjectsLink = isInProjectPage || isInInboxPage
+
+	return (
+		<div>
+			{showProjectsLink && (
+				<Link to="/project" withLeftIcon>
+					Projects
+				</Link>
+			)}
+		</div>
+	)
+}
+
+function UserEmail() {
+	const token = Cookies.get('token')
+	if (!token) return null
+	const user = jwtDecode<{ sub: string }>(token)
+	const email = user.sub
+	return <h6 className="text-xs text-gray-500">{email}</h6>
 }
