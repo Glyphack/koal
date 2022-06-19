@@ -3,7 +3,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { Layout } from '../features/ui'
 import { Router } from './router'
 
-const client = new QueryClient({
+export const queryClient = new QueryClient({
 	defaultOptions: {
 		queries: { retry: false, refetchOnWindowFocus: false },
 		mutations: { retry: false },
@@ -13,7 +13,7 @@ const client = new QueryClient({
 export function App() {
 	return (
 		<BrowserRouter>
-			<QueryClientProvider client={client}>
+			<QueryClientProvider client={queryClient}>
 				<Layout>
 					<Router />
 				</Layout>
