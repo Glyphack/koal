@@ -41,9 +41,19 @@ function ProjectsLink() {
 }
 
 function UserEmail() {
+	const email = getEmailFromToken()
+	if (email.error) return null
+	return <h6 className="text-xs text-gray-500">{email.data}</h6>
+}
+
+function getEmailFromToken() {
 	const token = Cookies.get('token')
-	if (!token) return null
-	const user = jwtDecode<{ sub: string }>(token)
-	const email = user.sub
-	return <h6 className="text-xs text-gray-500">{email}</h6>
+	if (!token) return { error: true, data: undefined }
+	try {
+		const user = jwtDecode<{ sub: string }>(token)
+		const email = user.sub
+		return { error: false, data: email }
+	} catch (error) {
+		return { error: true, data: undefined }
+	}
 }
