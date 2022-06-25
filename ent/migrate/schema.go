@@ -30,6 +30,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "uuid", Type: field.TypeUUID},
 		{Name: "owner_id", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "project_items", Type: field.TypeInt, Nullable: true},
 	}
 	// TodoItemsTable holds the schema information for the "todo_items" table.
@@ -40,7 +41,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "todo_items_projects_items",
-				Columns:    []*schema.Column{TodoItemsColumns[6]},
+				Columns:    []*schema.Column{TodoItemsColumns[7]},
 				RefColumns: []*schema.Column{ProjectsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},

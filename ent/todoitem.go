@@ -28,6 +28,8 @@ type TodoItem struct {
 	UUID uuid.UUID `json:"uuid,omitempty"`
 	// OwnerID holds the value of the "owner_id" field.
 	OwnerID string `json:"owner_id,omitempty"`
+	// Description holds the value of the "description" field.
+	Description string `json:"description,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TodoItemQuery when eager-loading is set.
 	Edges         TodoItemEdges `json:"edges"`
@@ -66,7 +68,7 @@ func (*TodoItem) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullBool)
 		case todoitem.FieldID:
 			values[i] = new(sql.NullInt64)
-		case todoitem.FieldTitle, todoitem.FieldOwnerID:
+		case todoitem.FieldTitle, todoitem.FieldOwnerID, todoitem.FieldDescription:
 			values[i] = new(sql.NullString)
 		case todoitem.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -125,6 +127,12 @@ func (ti *TodoItem) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				ti.OwnerID = value.String
 			}
+		case todoitem.FieldDescription:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field description", values[i])
+			} else if value.Valid {
+				ti.Description = value.String
+			}
 		case todoitem.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field project_items", value)
@@ -175,6 +183,8 @@ func (ti *TodoItem) String() string {
 	builder.WriteString(fmt.Sprintf("%v", ti.UUID))
 	builder.WriteString(", owner_id=")
 	builder.WriteString(ti.OwnerID)
+	builder.WriteString(", description=")
+	builder.WriteString(ti.Description)
 	builder.WriteByte(')')
 	return builder.String()
 }

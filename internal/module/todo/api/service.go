@@ -53,12 +53,7 @@ func (s server) GetProjectDetails(ctx context.Context, request *todov1.GetProjec
 	}
 	var itemsMsg []*todov1.TodoItem
 	for _, item := range project.Items {
-		itemsMsg = append(itemsMsg, &todov1.TodoItem{
-			Id:      item.UUId.String(),
-			Title:   item.Title,
-			IsDone:  item.IsDone,
-			Project: projectMsg,
-		})
+		itemsMsg = append(itemsMsg, convertDomainItemToResponseItem(item))
 	}
 
 	return &todov1.GetProjectDetailsResponse{
@@ -121,15 +116,7 @@ func (s server) CreateTodoItem(ctx context.Context, request *todov1.CreateTodoIt
 	}
 
 	return &todov1.CreateTodoItemResponse{
-		CreatedItem: &todov1.TodoItem{
-			Id:     todoItem.UUId.String(),
-			Title:  todoItem.Title,
-			IsDone: false,
-			Project: &todov1.Project{
-				Id:   todoItem.Project.UUId.String(),
-				Name: todoItem.Project.Name,
-			},
-		},
+		CreatedItem: convertDomainItemToResponseItem(&todoItem),
 	}, nil
 }
 
@@ -144,7 +131,7 @@ func (s server) DeleteTodoItem(ctx context.Context, request *todov1.DeleteTodoIt
 
 func (s server) UpdateTodoItem(ctx context.Context, request *todov1.UpdateTodoItemRequest) (*emptypb.Empty, error) {
 	userId := fmt.Sprint(ctx.Value("userId"))
-	_, err := s.useCaseInteractor.UpdateItem(ctx, request.Id, request.Title, request.IsDone, userId)
+	_, err := s.useCaseInteractor.UpdateItem(ctx, request.Id, request.Title, request.IsDone, userId, request.Description)
 	if err != nil {
 		return nil, TranslateDomainAndInfraError(err)
 	}
@@ -164,15 +151,7 @@ func (s server) GetUndoneList(ctx context.Context, _ *emptypb.Empty) (*todov1.Ge
 	}
 	var undoneItems []*todov1.TodoItem
 	for _, item := range items {
-		undoneItems = append(undoneItems, &todov1.TodoItem{
-			Id:     item.UUId.String(),
-			Title:  item.Title,
-			IsDone: false,
-			Project: &todov1.Project{
-				Id:   item.Project.UUId.String(),
-				Name: item.Project.Name,
-			},
-		})
+		undoneItems = append(undoneItems, convertDomainItemToResponseItem(item))
 	}
 	return &todov1.GetUndoneListResponse{Items: undoneItems}, nil
 }
@@ -192,4 +171,16 @@ func TranslateDomainAndInfraError(err error) error {
 		return status.Error(codes.NotFound, err.Error())
 	}
 	return status.Error(codes.Internal, "internal error")
+}
+
+func convertDomainItemToResponseItem(item *tododomain.TodoItem) *todov1.TodoItem {
+	return &todov1.TodoItem{
+		Id:     item.UUId.String(),
+		Title:  item.Title,
+		IsDone: item.IsDone,
+		Project: &todov1.Project{
+			Id:   item.Project.UUId.String(),
+			Name: item.Project.Name,
+		},
+	}
 }

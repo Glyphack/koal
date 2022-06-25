@@ -68,6 +68,20 @@ func (tic *TodoItemCreate) SetOwnerID(s string) *TodoItemCreate {
 	return tic
 }
 
+// SetDescription sets the "description" field.
+func (tic *TodoItemCreate) SetDescription(s string) *TodoItemCreate {
+	tic.mutation.SetDescription(s)
+	return tic
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (tic *TodoItemCreate) SetNillableDescription(s *string) *TodoItemCreate {
+	if s != nil {
+		tic.SetDescription(*s)
+	}
+	return tic
+}
+
 // SetProjectID sets the "project" edge to the Project entity by ID.
 func (tic *TodoItemCreate) SetProjectID(id int) *TodoItemCreate {
 	tic.mutation.SetProjectID(id)
@@ -255,6 +269,14 @@ func (tic *TodoItemCreate) createSpec() (*TodoItem, *sqlgraph.CreateSpec) {
 			Column: todoitem.FieldOwnerID,
 		})
 		_node.OwnerID = value
+	}
+	if value, ok := tic.mutation.Description(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: todoitem.FieldDescription,
+		})
+		_node.Description = value
 	}
 	if nodes := tic.mutation.ProjectIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

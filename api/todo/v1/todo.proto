@@ -99,6 +99,7 @@ message TodoItem {
     string title = 2;
     bool is_done = 3;
     Project project = 4;
+    string description = 5;
 }
 
 message Project {
@@ -160,4 +161,5 @@ message UpdateTodoItemRequest {
     string id = 1;
     string title = 2;
     bool is_done = 3;
+    string description = 4;
 }

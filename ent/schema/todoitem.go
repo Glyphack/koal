@@ -24,6 +24,7 @@ func (TodoItem) Fields() []ent.Field {
 		field.UUID("uuid", uuid.UUID{}).
 			Default(uuid.New),
 		field.String("owner_id"),
+		field.String("description").Optional(),
 	}
 }
 

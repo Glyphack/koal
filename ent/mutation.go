@@ -589,6 +589,7 @@ type TodoItemMutation struct {
 	created_at     *time.Time
 	uuid           *uuid.UUID
 	owner_id       *string
+	description    *string
 	clearedFields  map[string]struct{}
 	project        *int
 	clearedproject bool
@@ -856,6 +857,55 @@ func (m *TodoItemMutation) ResetOwnerID() {
 	m.owner_id = nil
 }
 
+// SetDescription sets the "description" field.
+func (m *TodoItemMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *TodoItemMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the TodoItem entity.
+// If the TodoItem object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TodoItemMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *TodoItemMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[todoitem.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *TodoItemMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[todoitem.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *TodoItemMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, todoitem.FieldDescription)
+}
+
 // SetProjectID sets the "project" edge to the Project entity by id.
 func (m *TodoItemMutation) SetProjectID(id int) {
 	m.project = &id
@@ -914,7 +964,7 @@ func (m *TodoItemMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TodoItemMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.title != nil {
 		fields = append(fields, todoitem.FieldTitle)
 	}
@@ -929,6 +979,9 @@ func (m *TodoItemMutation) Fields() []string {
 	}
 	if m.owner_id != nil {
 		fields = append(fields, todoitem.FieldOwnerID)
+	}
+	if m.description != nil {
+		fields = append(fields, todoitem.FieldDescription)
 	}
 	return fields
 }
@@ -948,6 +1001,8 @@ func (m *TodoItemMutation) Field(name string) (ent.Value, bool) {
 		return m.UUID()
 	case todoitem.FieldOwnerID:
 		return m.OwnerID()
+	case todoitem.FieldDescription:
+		return m.Description()
 	}
 	return nil, false
 }
@@ -967,6 +1022,8 @@ func (m *TodoItemMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldUUID(ctx)
 	case todoitem.FieldOwnerID:
 		return m.OldOwnerID(ctx)
+	case todoitem.FieldDescription:
+		return m.OldDescription(ctx)
 	}
 	return nil, fmt.Errorf("unknown TodoItem field %s", name)
 }
@@ -1011,6 +1068,13 @@ func (m *TodoItemMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetOwnerID(v)
 		return nil
+	case todoitem.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
 	}
 	return fmt.Errorf("unknown TodoItem field %s", name)
 }
@@ -1040,7 +1104,11 @@ func (m *TodoItemMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *TodoItemMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(todoitem.FieldDescription) {
+		fields = append(fields, todoitem.FieldDescription)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1053,6 +1121,11 @@ func (m *TodoItemMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *TodoItemMutation) ClearField(name string) error {
+	switch name {
+	case todoitem.FieldDescription:
+		m.ClearDescription()
+		return nil
+	}
 	return fmt.Errorf("unknown TodoItem nullable field %s", name)
 }
 
@@ -1074,6 +1147,9 @@ func (m *TodoItemMutation) ResetField(name string) error {
 		return nil
 	case todoitem.FieldOwnerID:
 		m.ResetOwnerID()
+		return nil
+	case todoitem.FieldDescription:
+		m.ResetDescription()
 		return nil
 	}
 	return fmt.Errorf("unknown TodoItem field %s", name)

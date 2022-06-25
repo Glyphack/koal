@@ -10,6 +10,7 @@ import (
 	tododomain "github.com/glyphack/koal/internal/module/todo/domain/todo"
 	"github.com/glyphack/koal/pkg/entutils"
 	"github.com/google/uuid"
+	log "github.com/sirupsen/logrus"
 )
 
 type ItemDB struct {
@@ -20,7 +21,7 @@ type ItemDB struct {
 
 func (i ItemDB) CreateItem(ctx context.Context, newItem *tododomain.TodoItem) error {
 	if newItem.Project == nil {
-		err := i.ItemClient.Create().SetOwnerID(newItem.OwnerId).SetTitle(newItem.Title).SetUUID(newItem.UUId).Exec(ctx)
+		err := i.ItemClient.Create().SetOwnerID(newItem.OwnerId).SetTitle(newItem.Title).SetUUID(newItem.UUId).SetDescription(newItem.Description).Exec(ctx)
 		if err != nil {
 			return err
 		}
@@ -30,7 +31,7 @@ func (i ItemDB) CreateItem(ctx context.Context, newItem *tododomain.TodoItem) er
 	if err != nil {
 		return err
 	}
-	err = i.ItemClient.Create().SetOwnerID(newItem.OwnerId).SetTitle(newItem.Title).SetUUID(newItem.UUId).SetProjectID(projectId).Exec(ctx)
+	err = i.ItemClient.Create().SetOwnerID(newItem.OwnerId).SetTitle(newItem.Title).SetUUID(newItem.UUId).SetProjectID(projectId).SetDescription(newItem.Description).Exec(ctx)
 	if err != nil {
 		return err
 	}
@@ -62,29 +63,7 @@ func (i ItemDB) GetItemById(ctx context.Context, Id string) (*tododomain.TodoIte
 	if err != nil {
 		return nil, err
 	}
-	project, projectNotExist := dbItem.Edges.ProjectOrErr()
-	if projectNotExist != nil {
-		return &tododomain.TodoItem{
-			UUId:    dbItem.UUID,
-			Title:   dbItem.Title,
-			OwnerId: dbItem.OwnerID,
-			IsDone:  dbItem.IsDone,
-			Project: nil,
-		}, nil
-
-	}
-	return &tododomain.TodoItem{
-		UUId:    dbItem.UUID,
-		Title:   dbItem.Title,
-		OwnerId: dbItem.OwnerID,
-		IsDone:  dbItem.IsDone,
-		Project: &tododomain.Project{
-			UUId:    project.UUID,
-			Name:    project.Name,
-			OwnerId: project.OwnerID,
-		},
-	}, nil
-
+	return convertDbItemTypeToDomainItem(dbItem), nil
 }
 
 func (i ItemDB) UpdateItem(ctx context.Context, Id string, updatedItem *tododomain.TodoItem) error {
@@ -106,7 +85,7 @@ func (i ItemDB) AllUndoneItems(ctx context.Context, ownerId string) ([]*tododoma
 	dbUndoneItems, err := i.ItemClient.Query().Where(
 		todoitem.OwnerID(ownerId),
 		todoitem.IsDone(false),
-	).Order(ent.Asc(todoitem.FieldIsDone), ent.Desc(todoitem.FieldCreatedAt)).All(ctx)
+	).Order(ent.Asc(todoitem.FieldIsDone), ent.Desc(todoitem.FieldCreatedAt)).WithProject().All(ctx)
 
 	if ent.IsNotFound(err) {
 		return nil, NotFoundErr
@@ -116,20 +95,7 @@ func (i ItemDB) AllUndoneItems(ctx context.Context, ownerId string) ([]*tododoma
 	}
 	var items []*tododomain.TodoItem
 	for _, dbItem := range dbUndoneItems {
-		itemProject, err := dbItem.QueryProject().First(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("cannot load item project: %w", err) 
-		}
-		items = append(items, &tododomain.TodoItem{
-			Title:   dbItem.Title,
-			OwnerId: dbItem.OwnerID,
-			UUId:    dbItem.UUID,
-			Project: &tododomain.Project{
-				UUId:    itemProject.UUID,
-				Name:    itemProject.Name,
-				OwnerId: itemProject.OwnerID,
-			},
-		})
+		items = append(items, convertDbItemTypeToDomainItem(dbItem))
 	}
 	return items, nil
 }
@@ -156,7 +122,7 @@ func (i ItemDB) GetProject(ctx context.Context, ID string) (*tododomain.ProjectI
 	var items []*tododomain.TodoItem
 	dbItems, err := i.ItemClient.Query().Where(todoitem.HasProjectWith(project.UUID(projectUUID))).Order(
 		ent.Asc(todoitem.FieldIsDone), ent.Desc(todoitem.FieldCreatedAt),
-	).All(ctx)
+	).WithProject().All(ctx)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to get project items: %w", err)
@@ -166,13 +132,7 @@ func (i ItemDB) GetProject(ctx context.Context, ID string) (*tododomain.ProjectI
 		Name:    dbProject.Name,
 		OwnerId: dbProject.OwnerID}
 	for _, item := range dbItems {
-		items = append(items, &tododomain.TodoItem{
-			UUId:    item.UUID,
-			Title:   item.Title,
-			OwnerId: item.OwnerID,
-			Project: domainProject,
-			IsDone:  item.IsDone,
-		})
+		items = append(items, convertDbItemTypeToDomainItem(item))
 	}
 	return &tododomain.ProjectInfo{
 		Project: domainProject,
@@ -227,4 +187,32 @@ func (i ItemDB) UpdateProjectById(ctx context.Context, ID string, name string) e
 		return err
 	}
 	return nil
+}
+
+func convertDbItemTypeToDomainItem(item *ent.TodoItem) *tododomain.TodoItem {
+	dbproject, err := item.Edges.ProjectOrErr()
+	if err != nil {
+		log.Warnf("project is set to null for item %v", item)
+		return &tododomain.TodoItem{
+			UUId:        item.UUID,
+			Title:       item.Title,
+			OwnerId:     item.OwnerID,
+			Project:     nil,
+			IsDone:      item.IsDone,
+			Description: item.Description,
+		}
+	}
+	project := &tododomain.Project{
+		UUId:    dbproject.UUID,
+		Name:    dbproject.Name,
+		OwnerId: dbproject.OwnerID,
+	}
+	return &tododomain.TodoItem{
+		UUId:        item.UUID,
+		Title:       item.Title,
+		OwnerId:     item.OwnerID,
+		Project:     project,
+		IsDone:      item.IsDone,
+		Description: item.Description,
+	}
 }

@@ -23,6 +23,8 @@ const (
 	FieldUUID = "uuid"
 	// FieldOwnerID holds the string denoting the owner_id field in the database.
 	FieldOwnerID = "owner_id"
+	// FieldDescription holds the string denoting the description field in the database.
+	FieldDescription = "description"
 	// EdgeProject holds the string denoting the project edge name in mutations.
 	EdgeProject = "project"
 	// Table holds the table name of the todoitem in the database.
@@ -44,6 +46,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUUID,
 	FieldOwnerID,
+	FieldDescription,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "todo_items"

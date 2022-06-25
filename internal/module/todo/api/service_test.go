@@ -512,7 +512,8 @@ func (suite *Suite) Test_server_GetUndoneList() {
 				Name:    "projectWithItem",
 				OwnerId: "user1",
 			},
-			IsDone: false,
+			IsDone:      false,
+			Description: "test",
 		}},
 		want: &todov1.GetUndoneListResponse{
 			Items: []*todov1.TodoItem{
@@ -524,6 +525,7 @@ func (suite *Suite) Test_server_GetUndoneList() {
 						Id:   uuid.NewString(),
 						Name: "projectWithItem",
 					},
+					Description: "test",
 				},
 			},
 		},

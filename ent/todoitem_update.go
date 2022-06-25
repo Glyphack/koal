@@ -75,6 +75,26 @@ func (tiu *TodoItemUpdate) SetOwnerID(s string) *TodoItemUpdate {
 	return tiu
 }
 
+// SetDescription sets the "description" field.
+func (tiu *TodoItemUpdate) SetDescription(s string) *TodoItemUpdate {
+	tiu.mutation.SetDescription(s)
+	return tiu
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (tiu *TodoItemUpdate) SetNillableDescription(s *string) *TodoItemUpdate {
+	if s != nil {
+		tiu.SetDescription(*s)
+	}
+	return tiu
+}
+
+// ClearDescription clears the value of the "description" field.
+func (tiu *TodoItemUpdate) ClearDescription() *TodoItemUpdate {
+	tiu.mutation.ClearDescription()
+	return tiu
+}
+
 // SetProjectID sets the "project" edge to the Project entity by ID.
 func (tiu *TodoItemUpdate) SetProjectID(id int) *TodoItemUpdate {
 	tiu.mutation.SetProjectID(id)
@@ -212,6 +232,19 @@ func (tiu *TodoItemUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: todoitem.FieldOwnerID,
 		})
 	}
+	if value, ok := tiu.mutation.Description(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: todoitem.FieldDescription,
+		})
+	}
+	if tiu.mutation.DescriptionCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: todoitem.FieldDescription,
+		})
+	}
 	if tiu.mutation.ProjectCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -309,6 +342,26 @@ func (tiuo *TodoItemUpdateOne) SetUUID(u uuid.UUID) *TodoItemUpdateOne {
 // SetOwnerID sets the "owner_id" field.
 func (tiuo *TodoItemUpdateOne) SetOwnerID(s string) *TodoItemUpdateOne {
 	tiuo.mutation.SetOwnerID(s)
+	return tiuo
+}
+
+// SetDescription sets the "description" field.
+func (tiuo *TodoItemUpdateOne) SetDescription(s string) *TodoItemUpdateOne {
+	tiuo.mutation.SetDescription(s)
+	return tiuo
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (tiuo *TodoItemUpdateOne) SetNillableDescription(s *string) *TodoItemUpdateOne {
+	if s != nil {
+		tiuo.SetDescription(*s)
+	}
+	return tiuo
+}
+
+// ClearDescription clears the value of the "description" field.
+func (tiuo *TodoItemUpdateOne) ClearDescription() *TodoItemUpdateOne {
+	tiuo.mutation.ClearDescription()
 	return tiuo
 }
 
@@ -471,6 +524,19 @@ func (tiuo *TodoItemUpdateOne) sqlSave(ctx context.Context) (_node *TodoItem, er
 			Type:   field.TypeString,
 			Value:  value,
 			Column: todoitem.FieldOwnerID,
+		})
+	}
+	if value, ok := tiuo.mutation.Description(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: todoitem.FieldDescription,
+		})
+	}
+	if tiuo.mutation.DescriptionCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: todoitem.FieldDescription,
 		})
 	}
 	if tiuo.mutation.ProjectCleared() {

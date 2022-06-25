@@ -31,7 +31,7 @@ func (suite *TodoUseCaseSuite) SetupTest() {
 	suite.TodoRepository = todoinfra.ItemDB{
 		ProjectClient: client.Project,
 		ItemClient:    client.TodoItem,
-		Client: client,
+		Client:        client,
 	}
 }
 
@@ -408,11 +408,12 @@ func (suite *TodoUseCaseSuite) TestTodoUseCase_UpdateItem() {
 		},
 	}
 	type args struct {
-		ctx      context.Context
-		userId   string
-		itemId   string
-		newTitle string
-		isDone   bool
+		ctx         context.Context
+		userId      string
+		itemId      string
+		newTitle    string
+		isDone      bool
+		description string
 	}
 	tests := []struct {
 		name    string
@@ -453,6 +454,26 @@ func (suite *TodoUseCaseSuite) TestTodoUseCase_UpdateItem() {
 				OwnerId: testItem.OwnerId,
 				Project: testItem.Project,
 				IsDone:  true,
+			},
+			wantErr: false,
+		},
+		{
+			name: "can change item description",
+			args: args{
+				ctx:         context.Background(),
+				userId:      testItem.OwnerId,
+				itemId:      testItem.UUId.String(),
+				newTitle:    "new",
+				isDone:      true,
+				description: "new desc",
+			},
+			want: &tododomain.TodoItem{
+				UUId:        testItem.UUId,
+				Title:       "new",
+				OwnerId:     testItem.OwnerId,
+				Project:     testItem.Project,
+				IsDone:      true,
+				Description: "new desc",
 			},
 			wantErr: false,
 		},
@@ -499,7 +520,7 @@ func (suite *TodoUseCaseSuite) TestTodoUseCase_UpdateItem() {
 			u := todousecase.TodoUseCase{
 				TodoRepository: todo_repo_mock,
 			}
-			actual, err := u.UpdateItem(tt.args.ctx, tt.args.itemId, tt.args.newTitle, tt.args.isDone, tt.args.userId)
+			actual, err := u.UpdateItem(tt.args.ctx, tt.args.itemId, tt.args.newTitle, tt.args.isDone, tt.args.userId, tt.args.description)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TodoUseCase.DeleteProject() error = %v, wantErr %v", err, tt.wantErr)
 			}

@@ -12,7 +12,7 @@ type TodoUseCase struct {
 	TodoRepository todoinfra.TodoRepository
 }
 
-func (u *TodoUseCase) UpdateItem(ctx context.Context, itemId string, newTitle string, isDone bool, userId string) (*tododomain.TodoItem, error) {
+func (u *TodoUseCase) UpdateItem(ctx context.Context, itemId string, newTitle string, isDone bool, userId string, newDesc string) (*tododomain.TodoItem, error) {
 	item, err := u.TodoRepository.GetItemById(ctx, itemId)
 	if err != nil {
 		return nil, err
@@ -25,6 +25,11 @@ func (u *TodoUseCase) UpdateItem(ctx context.Context, itemId string, newTitle st
 		}
 	}
 	err = item.UpdateStatus(userId, isDone)
+	if err != nil {
+		return nil, err
+	}
+
+	err = item.UpdateDescription(userId, newDesc)
 	if err != nil {
 		return nil, err
 	}

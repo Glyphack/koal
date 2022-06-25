@@ -181,6 +181,9 @@
                 },
                 "isDone": {
                   "type": "boolean"
+                },
+                "description": {
+                  "type": "string"
                 }
               }
             }
@@ -577,6 +580,9 @@
         },
         "project": {
           "$ref": "#/definitions/v1Project"
+        },
+        "description": {
+          "type": "string"
         }
       }
     }
