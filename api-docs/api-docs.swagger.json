@@ -439,6 +439,9 @@
           "required": [
             "title"
           ]
+        },
+        "description": {
+          "type": "string"
         }
       },
       "required": [

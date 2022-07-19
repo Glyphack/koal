@@ -143,6 +143,7 @@ message GetProjectDetailsResponse {
 message CreateTodoItemRequest {
     string project_id = 1;
     string title = 2 [(google.api.field_behavior) = REQUIRED];
+    string description = 3;
 }
 
 message CreateTodoItemResponse {

@@ -105,10 +105,11 @@ func (s server) CreateTodoItem(ctx context.Context, request *todov1.CreateTodoIt
 		return nil, status.Error(codes.InvalidArgument, "ProjectId is invalid")
 	}
 	todoItem := tododomain.TodoItem{
-		UUId:    uuid.New(),
-		Title:   request.Title,
-		OwnerId: fmt.Sprint(ctx.Value("userId")),
-		Project: &tododomain.Project{UUId: projectId},
+		UUId:        uuid.New(),
+		Title:       request.Title,
+		OwnerId:     fmt.Sprint(ctx.Value("userId")),
+		Project:     &tododomain.Project{UUId: projectId},
+		Description: request.Description,
 	}
 	err = s.itemRepository.CreateItem(ctx, &todoItem)
 	if err != nil {
