@@ -1,6 +1,7 @@
 # Go
 out/
 vendor/
+gen/
 
 # Logs
 logs
