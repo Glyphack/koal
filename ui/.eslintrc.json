@@ -1,0 +1,22 @@
+{
+	"root": true,
+	"parser": "@typescript-eslint/parser",
+	"plugins": ["testing-library", "jest-dom"],
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
+		"prettier",
+		"plugin:react/recommended",
+		"plugin:react/jsx-runtime",
+		"plugin:react-hooks/recommended",
+		"plugin:jest-dom/recommended",
+		"plugin:testing-library/react",
+		"plugin:testing-library/dom"
+	],
+	"rules": {
+		"@typescript-eslint/no-non-null-assertion": "off"
+	},
+	"settings": {
+		"react": { "version": "detect" }
+	}
+}
