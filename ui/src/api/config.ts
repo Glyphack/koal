@@ -6,6 +6,7 @@ import { useAuth } from '../features/auth'
 const API_URL = import.meta.env.VITE_API_URL
 export const publicRequest = axios.create({ baseURL: API_URL })
 export const privateRequest = axios.create({ baseURL: API_URL })
+
 privateRequest.interceptors.request.use(
 	(config) => {
 		const token = Cookies.get('token')
@@ -25,6 +26,6 @@ privateRequest.interceptors.response.use(
 			useAuth.getState().signOut()
 			queryClient.clear()
 		}
-		return error
+		return Promise.reject(error)
 	}
 )
