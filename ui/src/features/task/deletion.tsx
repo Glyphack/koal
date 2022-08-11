@@ -10,7 +10,10 @@ interface TaskDeletionProps {
 export function TaskDeletion({ taskId }: TaskDeletionProps) {
 	const queryClient = useQueryClient()
 	const deleteTaskMutation = useMutation(api.deleteTask, {
-		onSuccess: () => queryClient.invalidateQueries(QueryKey.Project),
+		onSuccess: () => {
+			queryClient.invalidateQueries(QueryKey.Project)
+			queryClient.invalidateQueries(QueryKey.Inbox)
+		},
 	})
 	const deleteTask = () => deleteTaskMutation.mutate(taskId)
 
