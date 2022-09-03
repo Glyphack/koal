@@ -2,9 +2,11 @@
 
 Koal is a personal goal management and time tracker software. It's approach to task and time management is different than other tools, not too much sophisticated time tracker app and not a useless todo app.
 
-## Technical Documentation
+## Backend and Frontend code
 
-This repository holds all the backend code for Koal app.
+Both backens
+
+## Backend Technical Documentation
 
 ### Architecture
 
@@ -12,7 +14,7 @@ I followed a modular monolith design approach with Koal, it consists of services
 
 #### API
 
-Each service defines it's API in `/api` directory with Protobuf and implement the API servicr in their module, these definitions will create a REST API using grpc-gateway project.
+Each service defines it's API in `/api` directory with Protobuf and implement the API servicer in their module, these definitions will create a REST API using grpc-gateway project.
 
 The Gateway is created within the main component and services are given to it as an input.
 
@@ -33,18 +35,26 @@ Modules all follow the same architectural pattern. They are using DDD, and this 
 1. Auth: Implements auth API
 2. Todo: Implements the todo features
 
+### Error handling
+
+Errors are monitored with Sentry. If an error cannot be handled it will be annotated and returned, the API layer
+will get these errors and return appropriate response.
+There also a grpc interceptor which sends these errors to sentry along with the contextual information.
+
 ## Development
 
 ### Running locally
 
-Install dependencies and run the project
+To run the server install dependencies and run the project
 
-    ```bash
+```bash
         go mod vendor
         go run cmd/main.go
-    ```
+```
+
 Then you can interact with API using the Swagger UI at the address `/api-docs/swagger`
 
 ### Build
 
+TODO: (glyphack): add complete docs for generating Protobuf messages and
 Install buf, [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway#installation)
