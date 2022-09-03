@@ -17,7 +17,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-type server struc {
+type server struct {
 	itemRepository    todoinfra.TodoRepository
 	useCaseInteractor todousecase.TodoUseCase
 }
