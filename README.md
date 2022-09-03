@@ -48,8 +48,7 @@ There also a grpc interceptor which sends these errors to sentry along with the 
 To run the server install dependencies and run the project
 
 ```bash
-        go mod vendor
-        go run cmd/main.go
+        go run server/cmd/main.go
 ```
 
 Then you can interact with API using the Swagger UI at the address `/api-docs/swagger`
