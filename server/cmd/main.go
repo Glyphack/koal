@@ -10,6 +10,7 @@ import (
 	sentryhttp "github.com/getsentry/sentry-go/http"
 
 	"github.com/getsentry/sentry-go"
+
 	todov1 "github.com/glyphack/koal/gen/proto/go/todo/v1"
 	todoapi "github.com/glyphack/koal/internal/module/todo/api"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -32,7 +33,6 @@ import (
 )
 
 func main() {
-
 	config.InitConfig()
 	lis, err := net.Listen("tcp", ":8080")
 	if err != nil {
@@ -123,5 +123,4 @@ func newClient() *ent.Client {
 		}
 		return client
 	}
-
 }

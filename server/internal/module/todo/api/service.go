@@ -17,7 +17,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-type server struct {
+type server struc {
 	itemRepository    todoinfra.TodoRepository
 	useCaseInteractor todousecase.TodoUseCase
 }
@@ -38,10 +38,12 @@ func (s server) GetProjects(ctx context.Context, _ *emptypb.Empty) (*todov1.GetP
 	}
 
 	return &todov1.GetProjectsResponse{Projects: projectPresentations}, nil
-
 }
 
-func (s server) GetProjectDetails(ctx context.Context, request *todov1.GetProjectDetailsRequest) (*todov1.GetProjectDetailsResponse, error) {
+func (s server) GetProjectDetails(
+	ctx context.Context,
+	request *todov1.GetProjectDetailsRequest,
+) (*todov1.GetProjectDetailsResponse, error) {
 	userId := fmt.Sprint(ctx.Value("userId"))
 	project, err := s.useCaseInteractor.GetProject(ctx, userId, request.Id)
 	if err != nil {
@@ -62,7 +64,10 @@ func (s server) GetProjectDetails(ctx context.Context, request *todov1.GetProjec
 	}, nil
 }
 
-func (s server) CreateProject(ctx context.Context, request *todov1.CreateProjectRequest) (*todov1.CreateProjectResponse, error) {
+func (s server) CreateProject(
+	ctx context.Context,
+	request *todov1.CreateProjectRequest,
+) (*todov1.CreateProjectResponse, error) {
 	userId := fmt.Sprint(ctx.Value("userId"))
 	project, err := s.useCaseInteractor.CreateProject(ctx, userId, request.Name)
 	if err != nil {
@@ -99,7 +104,10 @@ func (s server) DeleteProject(ctx context.Context, request *todov1.DeleteProject
 	return &emptypb.Empty{}, nil
 }
 
-func (s server) CreateTodoItem(ctx context.Context, request *todov1.CreateTodoItemRequest) (*todov1.CreateTodoItemResponse, error) {
+func (s server) CreateTodoItem(
+	ctx context.Context,
+	request *todov1.CreateTodoItemRequest,
+) (*todov1.CreateTodoItemResponse, error) {
 	projectId, err := uuid.Parse(request.GetProjectId())
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "ProjectId is invalid")
