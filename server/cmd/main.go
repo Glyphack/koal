@@ -83,7 +83,7 @@ func main() {
 	r := http.NewServeMux()
 
 	// Copied while building in docker
-	fs := http.FileServer(http.Dir("../api-docs/"))
+	fs := http.FileServer(http.Dir("./api-docs/"))
 	r.Handle("/api-docs/", http.StripPrefix("/api-docs/", fs))
 
 	gwmux := runtime.NewServeMux()
