@@ -628,10 +628,12 @@ func TestServer_CreateTodoItem(t *testing.T) {
 	ctx := testutils.GetAuthenticatedContext(context.Background(), ownerId)
 	project := client.Project.Create().SetOwnerID(ownerId).SetName("testProj1").SaveX(ctx)
 	request := &todov1.CreateTodoItemRequest{
-		ProjectId: project.UUID.String(),
-		Title:     "new task",
+		ProjectId:   project.UUID.String(),
+		Title:       "new task",
+		Description: "desc",
 	}
 	response, err := server.CreateTodoItem(ctx, request)
 	assert.Nil(t, err)
 	assert.Equal(t, response.GetCreatedItem().GetTitle(), request.Title)
+	assert.Equal(t, response.CreatedItem.GetDescription(), request.Description)
 }

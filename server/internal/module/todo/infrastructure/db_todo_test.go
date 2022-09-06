@@ -3,6 +3,7 @@ package todoinfra_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -469,7 +470,6 @@ func (suite *Suite) Test_db_todo_AllUndoneItems() {
 				t.Errorf("error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-
 		})
 	}
 }
@@ -493,29 +493,55 @@ func TestItemDB_AllProjects(t *testing.T) {
 	assert.Equal(t, project.UUID, projects[0].UUId)
 }
 
-func TestItemDB_CreateItem(t *testing.T) {
-	client := enttest.Open(t, "sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
-	defer client.Close()
+func (suite *Suite) Test_db_todo_CreateItem() {
 	ctx := context.Background()
 
-	project := client.Project.Create().SetOwnerID("test").SetName("project").SaveX(ctx)
-
-	todoRepo := todoinfra.ItemDB{ItemClient: client.TodoItem, ProjectClient: client.Project, Client: client}
-	err := todoRepo.CreateItem(ctx, &todoitem.TodoItem{
-		UUId:    uuid.UUID{},
-		Title:   "new task",
-		OwnerId: "test",
-		Project: &todoitem.Project{
-			UUId:    project.UUID,
-			Name:    "",
-			OwnerId: "",
-		},
-	})
+	project, err := suite.ItemDB.ProjectClient.Create().SetOwnerID("test").SetName("project").Save(ctx)
 	if err != nil {
-		t.Fatal(err)
+		fmt.Println(err)
 	}
-
-	createdItem := client.TodoItem.Query().FirstX(ctx)
-	assert.Equal(t, createdItem.Title, "new task")
-	assert.Equal(t, createdItem.QueryProject().FirstIDX(ctx), project.ID)
+	type args struct {
+		ctx      context.Context
+		todoItem *tododomain.TodoItem
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Persists all the item attributes",
+			args: args{
+				ctx: ctx,
+				todoItem: &todoitem.TodoItem{
+					UUId:    uuid.New(),
+					Title:   "new task",
+					OwnerId: "test",
+					Project: &todoitem.Project{
+						UUId:    project.UUID,
+						Name:    project.Name,
+						OwnerId: project.OwnerID,
+					},
+					Description: "desc",
+					IsDone:      false,
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		suite.Run(tt.name, func() {
+			t := suite.T()
+			err := suite.ItemDB.CreateItem(tt.args.ctx, tt.args.todoItem)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			createdItemId := tt.args.todoItem.UUId.String()
+			createdItem, err := suite.ItemDB.GetItemById(tt.args.ctx, createdItemId)
+			if !reflect.DeepEqual(tt.args.todoItem, createdItem) {
+				t.Errorf("created Item and inserted item are not equal, created = %v inserted = %v", createdItem, tt.args.todoItem)
+			}
+		})
+	}
 }

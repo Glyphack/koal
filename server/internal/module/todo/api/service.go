@@ -191,5 +191,6 @@ func convertDomainItemToResponseItem(item *tododomain.TodoItem) *todov1.TodoItem
 			Id:   item.Project.UUId.String(),
 			Name: item.Project.Name,
 		},
+		Description: item.Description,
 	}
 }

@@ -31,7 +31,7 @@ func (i ItemDB) CreateItem(ctx context.Context, newItem *tododomain.TodoItem) er
 	if err != nil {
 		return err
 	}
-	err = i.ItemClient.Create().SetOwnerID(newItem.OwnerId).SetTitle(newItem.Title).SetUUID(newItem.UUId).SetProjectID(projectId).SetDescription(newItem.Description).Exec(ctx)
+	err = i.ItemClient.Create().SetUUID(newItem.UUId).SetOwnerID(newItem.OwnerId).SetTitle(newItem.Title).SetUUID(newItem.UUId).SetProjectID(projectId).SetDescription(newItem.Description).Exec(ctx)
 	if err != nil {
 		return err
 	}
@@ -123,14 +123,14 @@ func (i ItemDB) GetProject(ctx context.Context, ID string) (*tododomain.ProjectI
 	dbItems, err := i.ItemClient.Query().Where(todoitem.HasProjectWith(project.UUID(projectUUID))).Order(
 		ent.Asc(todoitem.FieldIsDone), ent.Desc(todoitem.FieldCreatedAt),
 	).WithProject().All(ctx)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to get project items: %w", err)
 	}
 	domainProject := &tododomain.Project{
 		UUId:    dbProject.UUID,
 		Name:    dbProject.Name,
-		OwnerId: dbProject.OwnerID}
+		OwnerId: dbProject.OwnerID,
+	}
 	for _, item := range dbItems {
 		items = append(items, convertDbItemTypeToDomainItem(item))
 	}
