@@ -8,7 +8,7 @@ export function ProjectForm() {
 	const form = useForm({ defaultValues: { name: '' } })
 	const mutation = useMutation(api.createProject, {
 		onSuccess: () => {
-			queryClient.invalidateQueries(QueryKey.Projects)
+			queryClient.invalidateQueries([QueryKey.Projects])
 			form.reset()
 		},
 	})

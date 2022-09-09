@@ -12,8 +12,8 @@ export function TaskCompletion({ taskId, isDone }: TaskCompletionProps) {
 	const queryClient = useQueryClient()
 	const updateTaskMutation = useMutation(api.updateTask, {
 		onSuccess: () => {
-			queryClient.invalidateQueries(QueryKey.Project)
-			queryClient.invalidateQueries(QueryKey.Inbox)
+			queryClient.invalidateQueries([QueryKey.Project])
+			queryClient.invalidateQueries([QueryKey.Inbox])
 		},
 	})
 	const checkTask = () => updateTaskMutation.mutate({ id: taskId, payload: { isDone: true } })

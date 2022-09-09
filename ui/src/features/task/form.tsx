@@ -12,7 +12,7 @@ export function TaskForm({ projectId }: TaskFormProps) {
 	const taskForm = useForm({ defaultValues: { title: '' } })
 	const createTaskMutation = useMutation(api.createTask, {
 		onSuccess: () => {
-			queryClient.invalidateQueries(QueryKey.Project)
+			queryClient.invalidateQueries([QueryKey.Project])
 			taskForm.reset()
 		},
 	})
