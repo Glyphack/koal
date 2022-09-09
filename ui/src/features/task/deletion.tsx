@@ -1,7 +1,7 @@
+import { ActionIcon } from '@mantine/core'
 import { HiOutlineTrash } from 'react-icons/hi'
 import { useMutation, useQueryClient } from 'react-query'
 import { api, QueryKey } from '../../api'
-import { Button } from '../ui'
 
 interface TaskDeletionProps {
 	taskId: string
@@ -18,14 +18,8 @@ export function TaskDeletion({ taskId }: TaskDeletionProps) {
 	const deleteTask = () => deleteTaskMutation.mutate(taskId)
 
 	return (
-		<Button
-			variant="icon"
-			type="button"
-			onClick={deleteTask}
-			loading={deleteTaskMutation.isLoading}
-			data-testid="task-deletion"
-		>
+		<ActionIcon onClick={deleteTask} loading={deleteTaskMutation.isLoading}>
 			<HiOutlineTrash />
-		</Button>
+		</ActionIcon>
 	)
 }

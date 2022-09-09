@@ -13,9 +13,7 @@ export function ProjectList() {
 		<div className="space-y-8">
 			{projects.map((project) => (
 				<div key={project.id}>
-					<Link className="text-3xl font-normal" to={`/project/${project.id}`}>
-						{project.name}
-					</Link>
+					<Link to={`/project/${project.id}`}>{project.name}</Link>
 				</div>
 			))}
 		</div>

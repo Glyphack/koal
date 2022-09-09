@@ -1,7 +1,8 @@
-import { useForm } from 'react-hook-form'
+import { Button, Textarea, TextInput } from '@mantine/core'
+import { useForm } from '@mantine/form'
 import { useMutation, useQueryClient } from 'react-query'
 import { api, QueryKey } from '../../api'
-import { Button, Field, Form } from '../ui'
+import { Form } from '../ui'
 
 interface TaskFormProps {
 	projectId: string
@@ -9,27 +10,33 @@ interface TaskFormProps {
 
 export function TaskForm({ projectId }: TaskFormProps) {
 	const queryClient = useQueryClient()
-	const taskForm = useForm({ defaultValues: { title: '' } })
+	const taskForm = useForm({ initialValues: { title: '', description: '' } })
 	const createTaskMutation = useMutation(api.createTask, {
 		onSuccess: () => {
 			queryClient.invalidateQueries([QueryKey.Project])
 			taskForm.reset()
 		},
 	})
-	const createTask = taskForm.handleSubmit((values) =>
-		createTaskMutation.mutate({ projectId, title: values.title })
+	const createTask = taskForm.onSubmit((values) =>
+		createTaskMutation.mutate({ projectId, ...values })
 	)
 
 	return (
 		<Form
 			onSubmit={createTask}
 			fields={
-				<Field
-					label="Task"
-					type="text"
-					placeholder="task name"
-					{...taskForm.register('title')}
-				/>
+				<>
+					<TextInput
+						label="Task"
+						placeholder="task name"
+						{...taskForm.getInputProps('title')}
+					/>
+					<Textarea
+						label="Description"
+						placeholder="task description"
+						{...taskForm.getInputProps('description')}
+					/>
+				</>
 			}
 			actions={
 				<Button type="submit" loading={createTaskMutation.isLoading}>
