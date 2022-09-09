@@ -7,7 +7,7 @@ export function ProjectList() {
 	if (projectsQuery.isLoading) return <Loader />
 	const projects = projectsQuery.data?.data.projects ?? []
 
-	if (projects.length === 0) return <p>👈 you can create a new project from the left panel</p>
+	if (projects.length === 0) return <p>Your projects will show up here 📜</p>
 
 	return (
 		<div className="space-y-8">
