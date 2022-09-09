@@ -7,6 +7,8 @@ export function ProjectList() {
 	if (projectsQuery.isLoading) return <Loader />
 	const projects = projectsQuery.data?.data.projects ?? []
 
+	if (projects.length === 0) return <p>👈 you can create a new project from the left panel</p>
+
 	return (
 		<div className="space-y-8">
 			{projects.map((project) => (
