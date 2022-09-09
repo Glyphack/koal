@@ -1,6 +1,6 @@
+import { Button } from '@mantine/core'
 import { HiArrowSmLeft } from 'react-icons/hi'
 import { useQueryClient } from 'react-query'
-import { Button } from '../ui'
 import { useAuth } from './use-auth'
 
 export function SignOutButton() {
@@ -12,8 +12,8 @@ export function SignOutButton() {
 	}
 
 	return (
-		<Button variant="text" onClick={handleSignOut}>
-			<HiArrowSmLeft /> Sign Out
+		<Button variant="subtle" leftIcon={<HiArrowSmLeft />} onClick={handleSignOut}>
+			Sign Out
 		</Button>
 	)
 }

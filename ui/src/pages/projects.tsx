@@ -8,9 +8,7 @@ export function ProjectsPage() {
 				<ProjectForm />
 			</div>
 			<div className="flex flex-col gap-10 grow">
-				<Link className="text-3xl font-normal" to="/inbox">
-					Inbox
-				</Link>
+				<Link to="/inbox">Inbox</Link>
 				<hr />
 				<ProjectList />
 			</div>

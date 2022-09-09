@@ -30,7 +30,7 @@ export function ProjectDetails({ projectId }: ProjectDetailsProps) {
 				<ProjectDeletion projectId={projectId} />
 			</div>
 			<div className="flex flex-col gap-20 lg:gap-40 lg:flex-row">
-				<div className="max-w-xs grow">
+				<div className="w-[20rem] shrink-0">
 					<TaskForm projectId={projectId} />
 				</div>
 				<div className="grow">
