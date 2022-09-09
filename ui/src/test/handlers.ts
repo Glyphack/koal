@@ -8,12 +8,14 @@ export const mockProject2 = { id: 'p2', name: 'project 2' }
 export const mockTask = {
 	id: 't1',
 	title: 'task https://task1.com 1',
+	description: 'task 1 description',
 	isDone: false,
 	project: mockProject1,
 }
 export const mockDoneTask = {
 	id: 't2',
 	title: 'task 2',
+	description: "task 2's description",
 	isDone: true,
 	project: mockProject2,
 }
