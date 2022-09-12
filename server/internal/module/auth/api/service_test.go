@@ -22,7 +22,10 @@ func TestRegisterValidInput(t *testing.T) {
 	client := enttest.Open(t, "sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
 	defer client.Close()
 	server := authapi.NewServer(client)
-	response, err := server.Register(context.Background(), &authv1.RegisterRequest{Email: "mail@test.com", Password: "password"})
+	response, err := server.Register(
+		context.Background(),
+		&authv1.RegisterRequest{Email: "mail@test.com", Password: "password"},
+	)
 	assert.Nil(t, err)
 	token, err := jwt.Parse(response.GetToken(), func(token *jwt.Token) (interface{}, error) {
 		return []byte(viper.GetString("jwt_secret")), nil
@@ -34,13 +37,19 @@ func TestDuplicateRegisterInputReturnsError(t *testing.T) {
 	client := enttest.Open(t, "sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
 	defer client.Close()
 	server := authapi.NewServer(client)
-	response, err := server.Register(context.Background(), &authv1.RegisterRequest{Email: "mail@test.com", Password: "password"})
+	response, err := server.Register(
+		context.Background(),
+		&authv1.RegisterRequest{Email: "mail@test.com", Password: "password"},
+	)
 	assert.Nil(t, err)
 	token, err := jwt.Parse(response.GetToken(), func(token *jwt.Token) (interface{}, error) {
 		return []byte(viper.GetString("jwt_secret")), nil
 	})
 	assert.True(t, token.Valid)
-	_, err = server.Register(context.Background(), &authv1.RegisterRequest{Email: "mail@test.com", Password: "password"})
+	_, err = server.Register(
+		context.Background(),
+		&authv1.RegisterRequest{Email: "mail@test.com", Password: "password"},
+	)
 	responseStatus, ok := status.FromError(err)
 	assert.True(t, ok)
 	assert.Equal(t, responseStatus.Code(), codes.AlreadyExists)
@@ -50,7 +59,10 @@ func TestRegisterInvalidEmail(t *testing.T) {
 	client := enttest.Open(t, "sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
 	defer client.Close()
 	server := authapi.NewServer(client)
-	_, err := server.Register(context.Background(), &authv1.RegisterRequest{Email: "invalidmail", Password: "password"})
+	_, err := server.Register(
+		context.Background(),
+		&authv1.RegisterRequest{Email: "invalidmail", Password: "password"},
+	)
 	responseStatus, ok := status.FromError(err)
 	assert.True(t, ok)
 	assert.Equal(t, responseStatus.Code(), codes.InvalidArgument)
@@ -61,7 +73,10 @@ func TestRegisterInvalidPassword(t *testing.T) {
 	client := enttest.Open(t, "sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
 	defer client.Close()
 	server := authapi.NewServer(client)
-	_, err := server.Register(context.Background(), &authv1.RegisterRequest{Email: "email@test.com", Password: "weak"})
+	_, err := server.Register(
+		context.Background(),
+		&authv1.RegisterRequest{Email: "email@test.com", Password: "weak"},
+	)
 	responseStatus, ok := status.FromError(err)
 	assert.True(t, ok)
 	assert.Equal(t, responseStatus.Code(), codes.InvalidArgument)
@@ -116,7 +131,10 @@ func TestLoginUserNotFound(t *testing.T) {
 	client := enttest.Open(t, "sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
 	defer client.Close()
 	server := authapi.NewServer(client)
-	_, err := server.Login(context.Background(), &authv1.LoginRequest{Email: "email@test.com", Password: "password"})
+	_, err := server.Login(
+		context.Background(),
+		&authv1.LoginRequest{Email: "email@test.com", Password: "password"},
+	)
 	responseStatus, ok := status.FromError(err)
 	assert.True(t, ok)
 	assert.Equal(t, responseStatus.Code(), codes.NotFound)

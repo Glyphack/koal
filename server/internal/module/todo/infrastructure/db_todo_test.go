@@ -289,7 +289,10 @@ func (suite *Suite) Test_db_todo_DeleteProject() {
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {
 			t := suite.T()
-			err := suite.ItemDB.DeleteProject(tt.args.ctx, tt.args.projectInfo.Project.UUId.String())
+			err := suite.ItemDB.DeleteProject(
+				tt.args.ctx,
+				tt.args.projectInfo.Project.UUId.String(),
+			)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("error = %v, wantErr %v", err, tt.wantErr)
@@ -297,13 +300,23 @@ func (suite *Suite) Test_db_todo_DeleteProject() {
 			}
 
 			// after successful delete, the project should not be found
-			if _, err = suite.ItemDB.GetProject(tt.args.ctx, tt.args.projectInfo.Project.UUId.String()); !errors.Is(err, todoinfra.NotFoundErr) {
-				t.Errorf("project is not deleted id = %v, err = %v", tt.args.projectInfo.Project.UUId, err)
+			if _, err = suite.ItemDB.GetProject(tt.args.ctx, tt.args.projectInfo.Project.UUId.String()); !errors.Is(
+				err,
+				todoinfra.NotFoundErr,
+			) {
+				t.Errorf(
+					"project is not deleted id = %v, err = %v",
+					tt.args.projectInfo.Project.UUId,
+					err,
+				)
 			}
 
 			// after successful delete, the project items should not exist
 			for _, item := range tt.args.projectInfo.Items {
-				if _, err = suite.ItemDB.GetItemById(tt.args.ctx, item.UUId.String()); !errors.Is(err, todoinfra.NotFoundErr) {
+				if _, err = suite.ItemDB.GetItemById(tt.args.ctx, item.UUId.String()); !errors.Is(
+					err,
+					todoinfra.NotFoundErr,
+				) {
 					t.Errorf("item is not deleted id = %v, err = %v", item.UUId.String(), err)
 				}
 			}
@@ -338,8 +351,12 @@ func (suite *Suite) Test_db_todo_UpdateProjectById() {
 				Name: "new project",
 			},
 			wantProject: &todoitem.ProjectInfo{
-				Project: &todoitem.Project{UUId: project.UUId, Name: "new project", OwnerId: project.OwnerId},
-				Items:   nil,
+				Project: &todoitem.Project{
+					UUId:    project.UUId,
+					Name:    "new project",
+					OwnerId: project.OwnerId,
+				},
+				Items: nil,
 			},
 			wantErr: false,
 		},
@@ -359,7 +376,11 @@ func (suite *Suite) Test_db_todo_UpdateProjectById() {
 				t.Error(err)
 			}
 			if !reflect.DeepEqual(gotProject.Project, tt.wantProject.Project) {
-				t.Errorf("projects does not match want = %v, got = %v", tt.wantProject.Project, gotProject.Project)
+				t.Errorf(
+					"projects does not match want = %v, got = %v",
+					tt.wantProject.Project,
+					gotProject.Project,
+				)
 			}
 		},
 		)
@@ -406,7 +427,10 @@ func (suite *Suite) Test_db_todo_DeleteItem() {
 
 			// after successful delete, the item should not be found
 
-			if _, err = suite.ItemDB.GetItemById(tt.args.ctx, tt.args.Id); !errors.Is(err, todoinfra.NotFoundErr) {
+			if _, err = suite.ItemDB.GetItemById(tt.args.ctx, tt.args.Id); !errors.Is(
+				err,
+				todoinfra.NotFoundErr,
+			) {
 				t.Errorf("item is not deleted id = %v, err = %v", tt.args.Id, err)
 			}
 		})
@@ -496,7 +520,10 @@ func TestItemDB_AllProjects(t *testing.T) {
 func (suite *Suite) Test_db_todo_CreateItem() {
 	ctx := context.Background()
 
-	project, err := suite.ItemDB.ProjectClient.Create().SetOwnerID("test").SetName("project").Save(ctx)
+	project, err := suite.ItemDB.ProjectClient.Create().
+		SetOwnerID("test").
+		SetName("project").
+		Save(ctx)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -540,7 +567,11 @@ func (suite *Suite) Test_db_todo_CreateItem() {
 			createdItemId := tt.args.todoItem.UUId.String()
 			createdItem, err := suite.ItemDB.GetItemById(tt.args.ctx, createdItemId)
 			if !reflect.DeepEqual(tt.args.todoItem, createdItem) {
-				t.Errorf("created Item and inserted item are not equal, created = %v inserted = %v", createdItem, tt.args.todoItem)
+				t.Errorf(
+					"created Item and inserted item are not equal, created = %v inserted = %v",
+					createdItem,
+					tt.args.todoItem,
+				)
 			}
 		})
 	}

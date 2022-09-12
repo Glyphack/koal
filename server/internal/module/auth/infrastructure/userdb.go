@@ -16,7 +16,11 @@ type UserRepositoryDB struct {
 }
 
 func (u *UserRepositoryDB) CreateUser(ctx context.Context, newUser *authuser.User) error {
-	err := u.Client.Create().SetEmail(newUser.Email).SetPassword(newUser.Password).SetUUID(uuid.New()).Exec(ctx)
+	err := u.Client.Create().
+		SetEmail(newUser.Email).
+		SetPassword(newUser.Password).
+		SetUUID(uuid.New()).
+		Exec(ctx)
 	if err != nil {
 		return err
 	}
@@ -42,13 +46,17 @@ func (u *UserRepositoryDB) DeleteUser(ctx context.Context, id string) error {
 		return errors.New("No user deleted")
 	}
 	if count > 1 {
-		log.WithFields(log.Fields{"count": count, "id": id}).Warn("Multiple users deleted with one id")
+		log.WithFields(log.Fields{"count": count, "id": id}).
+			Warn("Multiple users deleted with one id")
 	}
 	return nil
 }
 
 func (u *UserRepositoryDB) UpdateUser(ctx context.Context, newUser *authuser.User) error {
-	updated, err := u.Client.Update().Where(user.Email(newUser.Email)).SetPassword(newUser.Password).Save(ctx)
+	updated, err := u.Client.Update().
+		Where(user.Email(newUser.Email)).
+		SetPassword(newUser.Password).
+		Save(ctx)
 
 	if err != nil {
 		return err

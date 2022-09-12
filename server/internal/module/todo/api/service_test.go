@@ -88,9 +88,15 @@ func (suite *Suite) Test_server_GetProjectDetails() {
 	}{
 		{
 			name: "Get project details return project info correctly",
-			args: args{ctx: testutils.GetAuthenticatedContext(context.Background(), projectWithoutItem.OwnerId), in1: &todov1.GetProjectDetailsRequest{
-				Id: projectWithoutItem.UUId.String(),
-			}},
+			args: args{
+				ctx: testutils.GetAuthenticatedContext(
+					context.Background(),
+					projectWithoutItem.OwnerId,
+				),
+				in1: &todov1.GetProjectDetailsRequest{
+					Id: projectWithoutItem.UUId.String(),
+				},
+			},
 			want: &todov1.GetProjectDetailsResponse{
 				Info: &todov1.Project{
 					Id:   projectWithoutItem.UUId.String(),
@@ -101,11 +107,20 @@ func (suite *Suite) Test_server_GetProjectDetails() {
 			wantErr: false,
 		}, {
 			name: "Get project details returns project items",
-			args: args{ctx: testutils.GetAuthenticatedContext(context.Background(), projectWithItem.OwnerId), in1: &todov1.GetProjectDetailsRequest{
-				Id: projectWithItem.UUId.String(),
-			}},
+			args: args{
+				ctx: testutils.GetAuthenticatedContext(
+					context.Background(),
+					projectWithItem.OwnerId,
+				),
+				in1: &todov1.GetProjectDetailsRequest{
+					Id: projectWithItem.UUId.String(),
+				},
+			},
 			want: &todov1.GetProjectDetailsResponse{
-				Info: &todov1.Project{Id: projectWithItem.UUId.String(), Name: projectWithItem.Name},
+				Info: &todov1.Project{
+					Id:   projectWithItem.UUId.String(),
+					Name: projectWithItem.Name,
+				},
 				Items: []*todov1.TodoItem{{
 					Id:     item.UUId.String(),
 					Title:  item.Title,
@@ -119,15 +134,24 @@ func (suite *Suite) Test_server_GetProjectDetails() {
 			wantErr: false,
 		}, {
 			name: "return permission denied for un authorized user",
-			args: args{ctx: testutils.GetAuthenticatedContext(context.Background(), "NotOwner"), in1: &todov1.GetProjectDetailsRequest{
-				Id: projectWithItem.UUId.String(),
-			}},
+			args: args{
+				ctx: testutils.GetAuthenticatedContext(context.Background(), "NotOwner"),
+				in1: &todov1.GetProjectDetailsRequest{
+					Id: projectWithItem.UUId.String(),
+				},
+			},
 			want: nil, wantErr: true,
 		}, {
 			name: "return not found for un authorized user",
-			args: args{ctx: testutils.GetAuthenticatedContext(context.Background(), projectWithItem.OwnerId), in1: &todov1.GetProjectDetailsRequest{
-				Id: uuid.NewString(),
-			}},
+			args: args{
+				ctx: testutils.GetAuthenticatedContext(
+					context.Background(),
+					projectWithItem.OwnerId,
+				),
+				in1: &todov1.GetProjectDetailsRequest{
+					Id: uuid.NewString(),
+				},
+			},
 			want: nil, wantErr: true,
 		},
 	}
@@ -215,7 +239,10 @@ func (suite *Suite) Test_server_EditProject() {
 		{
 			name: "edit project will change name",
 			args: args{
-				ctx: testutils.GetAuthenticatedContext(context.Background(), projectWithoutItem.OwnerId),
+				ctx: testutils.GetAuthenticatedContext(
+					context.Background(),
+					projectWithoutItem.OwnerId,
+				),
 				in1: &todov1.EditProjectRequest{
 					Project: &todov1.Project{
 						Id:   projectWithoutItem.UUId.String(),
@@ -273,7 +300,10 @@ func (suite *Suite) Test_server_EditProject() {
 
 			// Check update is persisted in db
 			if tt.wantErr == false {
-				updateProject, _ := suite.TodoRepository.GetProject(tt.args.ctx, tt.args.in1.Project.Id)
+				updateProject, _ := suite.TodoRepository.GetProject(
+					tt.args.ctx,
+					tt.args.in1.Project.Id,
+				)
 				assert.Equal(t, updateProject.Project.Name, tt.args.in1.Project.Name)
 			}
 		})
@@ -301,7 +331,10 @@ func (suite *Suite) Test_server_DeleteProject() {
 		{
 			name: "delete project will delete from database",
 			args: args{
-				ctx: testutils.GetAuthenticatedContext(context.Background(), projectWithoutItem.OwnerId),
+				ctx: testutils.GetAuthenticatedContext(
+					context.Background(),
+					projectWithoutItem.OwnerId,
+				),
 				in1: &todov1.DeleteProjectRequest{
 					Id: projectWithoutItem.UUId.String(),
 				}},
@@ -359,7 +392,10 @@ func (suite *Suite) Test_server_DeleteTodoItem() {
 		{
 			name: "delete project will delete from database",
 			args: args{
-				ctx: testutils.GetAuthenticatedContext(context.Background(), projectWithItem.OwnerId),
+				ctx: testutils.GetAuthenticatedContext(
+					context.Background(),
+					projectWithItem.OwnerId,
+				),
 				in1: &todov1.DeleteTodoItemRequest{
 					Id: item.UUId.String(),
 				}},
@@ -418,7 +454,10 @@ func (suite *Suite) Test_server_UpdateTodoItem() {
 		{
 			name: "should update title",
 			args: args{
-				ctx: testutils.GetAuthenticatedContext(context.Background(), projectWithItem.OwnerId),
+				ctx: testutils.GetAuthenticatedContext(
+					context.Background(),
+					projectWithItem.OwnerId,
+				),
 				in1: &todov1.UpdateTodoItemRequest{
 					Id:     item.UUId.String(),
 					Title:  "NewTitle",
@@ -433,7 +472,10 @@ func (suite *Suite) Test_server_UpdateTodoItem() {
 		}, {
 			name: "should update is done",
 			args: args{
-				ctx: testutils.GetAuthenticatedContext(context.Background(), projectWithItem.OwnerId),
+				ctx: testutils.GetAuthenticatedContext(
+					context.Background(),
+					projectWithItem.OwnerId,
+				),
 				in1: &todov1.UpdateTodoItemRequest{
 					Id:     item.UUId.String(),
 					Title:  item.Title,
@@ -449,7 +491,10 @@ func (suite *Suite) Test_server_UpdateTodoItem() {
 		{
 			name: "should ignore title if title is empty",
 			args: args{
-				ctx: testutils.GetAuthenticatedContext(context.Background(), projectWithItem.OwnerId),
+				ctx: testutils.GetAuthenticatedContext(
+					context.Background(),
+					projectWithItem.OwnerId,
+				),
 				in1: &todov1.UpdateTodoItemRequest{
 					Id:     item.UUId.String(),
 					Title:  "",

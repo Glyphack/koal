@@ -22,7 +22,10 @@ type server struct {
 	useCaseInteractor todousecase.TodoUseCase
 }
 
-func (s server) GetProjects(ctx context.Context, _ *emptypb.Empty) (*todov1.GetProjectsResponse, error) {
+func (s server) GetProjects(
+	ctx context.Context,
+	_ *emptypb.Empty,
+) (*todov1.GetProjectsResponse, error) {
 	projects, err := s.itemRepository.GetAllMemberProjects(ctx, fmt.Sprint(ctx.Value("userId")))
 	if err != nil {
 		return nil, status.Error(codes.Internal, "Cannot load user projects")
@@ -81,9 +84,17 @@ func (s server) CreateProject(
 	}, nil
 }
 
-func (s server) EditProject(ctx context.Context, request *todov1.EditProjectRequest) (*todov1.EditProjectResponse, error) {
+func (s server) EditProject(
+	ctx context.Context,
+	request *todov1.EditProjectRequest,
+) (*todov1.EditProjectResponse, error) {
 	userId := fmt.Sprint(ctx.Value("userId"))
-	project, err := s.useCaseInteractor.UpdateProject(ctx, userId, request.Project.Id, request.Project.Name)
+	project, err := s.useCaseInteractor.UpdateProject(
+		ctx,
+		userId,
+		request.Project.Id,
+		request.Project.Name,
+	)
 	if err != nil {
 		return nil, TranslateDomainAndInfraError(err)
 	}
@@ -95,7 +106,10 @@ func (s server) EditProject(ctx context.Context, request *todov1.EditProjectRequ
 	}, nil
 }
 
-func (s server) DeleteProject(ctx context.Context, request *todov1.DeleteProjectRequest) (*emptypb.Empty, error) {
+func (s server) DeleteProject(
+	ctx context.Context,
+	request *todov1.DeleteProjectRequest,
+) (*emptypb.Empty, error) {
 	userId := fmt.Sprint(ctx.Value("userId"))
 	err := s.useCaseInteractor.DeleteProject(ctx, userId, request.Id)
 	if err != nil {
@@ -129,7 +143,10 @@ func (s server) CreateTodoItem(
 	}, nil
 }
 
-func (s server) DeleteTodoItem(ctx context.Context, request *todov1.DeleteTodoItemRequest) (*emptypb.Empty, error) {
+func (s server) DeleteTodoItem(
+	ctx context.Context,
+	request *todov1.DeleteTodoItemRequest,
+) (*emptypb.Empty, error) {
 	userId := fmt.Sprint(ctx.Value("userId"))
 	err := s.useCaseInteractor.DeleteItem(ctx, request.Id, userId)
 	if err != nil {
@@ -138,16 +155,29 @@ func (s server) DeleteTodoItem(ctx context.Context, request *todov1.DeleteTodoIt
 	return &emptypb.Empty{}, nil
 }
 
-func (s server) UpdateTodoItem(ctx context.Context, request *todov1.UpdateTodoItemRequest) (*emptypb.Empty, error) {
+func (s server) UpdateTodoItem(
+	ctx context.Context,
+	request *todov1.UpdateTodoItemRequest,
+) (*emptypb.Empty, error) {
 	userId := fmt.Sprint(ctx.Value("userId"))
-	_, err := s.useCaseInteractor.UpdateItem(ctx, request.Id, request.Title, request.IsDone, userId, request.Description)
+	_, err := s.useCaseInteractor.UpdateItem(
+		ctx,
+		request.Id,
+		request.Title,
+		request.IsDone,
+		userId,
+		request.Description,
+	)
 	if err != nil {
 		return nil, TranslateDomainAndInfraError(err)
 	}
 	return &emptypb.Empty{}, nil
 }
 
-func (s server) GetUndoneList(ctx context.Context, _ *emptypb.Empty) (*todov1.GetUndoneListResponse, error) {
+func (s server) GetUndoneList(
+	ctx context.Context,
+	_ *emptypb.Empty,
+) (*todov1.GetUndoneListResponse, error) {
 	ownerId := fmt.Sprint(ctx.Value("userId"))
 	items, err := s.itemRepository.AllUndoneItems(ctx, ownerId)
 	if err != nil {
@@ -166,7 +196,11 @@ func (s server) GetUndoneList(ctx context.Context, _ *emptypb.Empty) (*todov1.Ge
 }
 
 func NewServer(dbConnection *ent.Client) *server {
-	itemRepo := &todoinfra.ItemDB{ItemClient: dbConnection.TodoItem, ProjectClient: dbConnection.Project, Client: dbConnection}
+	itemRepo := &todoinfra.ItemDB{
+		ItemClient:    dbConnection.TodoItem,
+		ProjectClient: dbConnection.Project,
+		Client:        dbConnection,
+	}
 	return &server{
 		itemRepository:    itemRepo,
 		useCaseInteractor: todousecase.TodoUseCase{TodoRepository: itemRepo},
