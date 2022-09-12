@@ -12,7 +12,14 @@ type TodoUseCase struct {
 	TodoRepository todoinfra.TodoRepository
 }
 
-func (u *TodoUseCase) UpdateItem(ctx context.Context, itemId string, newTitle string, isDone bool, userId string, newDesc string) (*tododomain.TodoItem, error) {
+func (u *TodoUseCase) UpdateItem(
+	ctx context.Context,
+	itemId string,
+	newTitle string,
+	isDone bool,
+	userId string,
+	newDesc string,
+) (*tododomain.TodoItem, error) {
 	item, err := u.TodoRepository.GetItemById(ctx, itemId)
 	if err != nil {
 		return nil, err
@@ -56,7 +63,11 @@ func (u *TodoUseCase) DeleteItem(ctx context.Context, itemId string, userId stri
 	return nil
 }
 
-func (u TodoUseCase) CreateProject(ctx context.Context, userId string, projectName string) (*tododomain.Project, error) {
+func (u TodoUseCase) CreateProject(
+	ctx context.Context,
+	userId string,
+	projectName string,
+) (*tododomain.Project, error) {
 	project := &tododomain.Project{
 		UUId:    uuid.New(),
 		Name:    projectName,
@@ -68,7 +79,12 @@ func (u TodoUseCase) CreateProject(ctx context.Context, userId string, projectNa
 	}
 	return project, nil
 }
-func (u TodoUseCase) GetProject(ctx context.Context, userId string, projectId string) (*tododomain.ProjectInfo, error) {
+
+func (u TodoUseCase) GetProject(
+	ctx context.Context,
+	userId string,
+	projectId string,
+) (*tododomain.ProjectInfo, error) {
 	dbProject, err := u.TodoRepository.GetProject(ctx, projectId)
 	if err != nil {
 		return nil, err
@@ -79,7 +95,12 @@ func (u TodoUseCase) GetProject(ctx context.Context, userId string, projectId st
 	return dbProject, nil
 }
 
-func (u TodoUseCase) UpdateProject(ctx context.Context, userId string, projectId string, name string) (*tododomain.Project, error) {
+func (u TodoUseCase) UpdateProject(
+	ctx context.Context,
+	userId string,
+	projectId string,
+	name string,
+) (*tododomain.Project, error) {
 	projectInfo, err := u.TodoRepository.GetProject(ctx, projectId)
 	if err != nil {
 		return nil, err

@@ -291,7 +291,12 @@ func (suite *TodoUseCaseSuite) TestTodoUseCase_UpdateProject() {
 	}{
 		{
 			name: "update will edit project",
-			args: args{ctx: context.Background(), userId: project.OwnerId, projectId: project.UUId.String(), name: "newName"},
+			args: args{
+				ctx:       context.Background(),
+				userId:    project.OwnerId,
+				projectId: project.UUId.String(),
+				name:      "newName",
+			},
 			want: &tododomain.Project{
 				UUId:    project.UUId,
 				Name:    "newName",
@@ -300,14 +305,24 @@ func (suite *TodoUseCaseSuite) TestTodoUseCase_UpdateProject() {
 			wantErr: false,
 		},
 		{
-			name:    "cannot update without permission",
-			args:    args{ctx: context.Background(), userId: "wrongUser", projectId: project.UUId.String(), name: project.Name},
+			name: "cannot update without permission",
+			args: args{
+				ctx:       context.Background(),
+				userId:    "wrongUser",
+				projectId: project.UUId.String(),
+				name:      project.Name,
+			},
 			want:    nil,
 			wantErr: true,
 		},
 		{
-			name:    "cannot update non existing project",
-			args:    args{ctx: context.Background(), userId: project.OwnerId, projectId: uuid.NewString(), name: project.Name},
+			name: "cannot update non existing project",
+			args: args{
+				ctx:       context.Background(),
+				userId:    project.OwnerId,
+				projectId: uuid.NewString(),
+				name:      project.Name,
+			},
 			want:    nil,
 			wantErr: true,
 		},
@@ -318,7 +333,12 @@ func (suite *TodoUseCaseSuite) TestTodoUseCase_UpdateProject() {
 			u := todousecase.TodoUseCase{
 				TodoRepository: suite.TodoRepository,
 			}
-			got, err := u.UpdateProject(tt.args.ctx, tt.args.userId, tt.args.projectId, tt.args.name)
+			got, err := u.UpdateProject(
+				tt.args.ctx,
+				tt.args.userId,
+				tt.args.projectId,
+				tt.args.name,
+			)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TodoUseCase.UpdateProject() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -520,7 +540,14 @@ func (suite *TodoUseCaseSuite) TestTodoUseCase_UpdateItem() {
 			u := todousecase.TodoUseCase{
 				TodoRepository: todo_repo_mock,
 			}
-			actual, err := u.UpdateItem(tt.args.ctx, tt.args.itemId, tt.args.newTitle, tt.args.isDone, tt.args.userId, tt.args.description)
+			actual, err := u.UpdateItem(
+				tt.args.ctx,
+				tt.args.itemId,
+				tt.args.newTitle,
+				tt.args.isDone,
+				tt.args.userId,
+				tt.args.description,
+			)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("TodoUseCase.DeleteProject() error = %v, wantErr %v", err, tt.wantErr)
 			}

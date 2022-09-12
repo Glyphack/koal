@@ -1,9 +1,10 @@
 package testutils
 
 import (
+	"testing"
+
 	"github.com/glyphack/koal/ent"
 	"github.com/glyphack/koal/ent/enttest"
-	"testing"
 )
 
 type TestWithDBClient struct {
