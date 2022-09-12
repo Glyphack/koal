@@ -7,7 +7,7 @@ interface LinkifiedProps {
 export function Linkified({ children }: LinkifiedProps) {
 	return (
 		<>
-			{children.split(' ').map((word, index) =>
+			{children.split(/( |\n)/g).map((word, index) =>
 				word.match(urlRegex()) ? (
 					<a
 						key={index}

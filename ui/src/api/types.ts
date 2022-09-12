@@ -42,6 +42,7 @@ export interface CreateTaskRequest {
 export interface UpdateTaskRequest {
 	title?: string
 	isDone?: boolean
+	description?: string
 }
 
 export interface FetchInboxResponse {
@@ -58,6 +59,7 @@ export interface ProjectInfo {
 export interface Task {
 	id: string
 	title: string
+	description: string
 	isDone: boolean
 	project: ProjectInfo
 }

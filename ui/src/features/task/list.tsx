@@ -6,6 +6,8 @@ interface TaskListProps {
 }
 
 export function TaskList({ tasks }: TaskListProps) {
+	if (tasks.length === 0) return <p>Your tasks will show up here ✔️</p>
+
 	return (
 		<div className="flex flex-col gap-4">
 			{tasks.map((task) => (
