@@ -87,6 +87,7 @@ func (i ItemDB) UpdateItem(ctx context.Context, Id string, updatedItem *tododoma
 		Where(todoitem.UUID(itemUUID)).
 		SetTitle(updatedItem.Title).
 		SetIsDone(updatedItem.IsDone).
+		SetDescription(updatedItem.Description).
 		Save(ctx)
 	if ent.IsNotFound(err) {
 		return fmt.Errorf("%w", NotFoundErr)
