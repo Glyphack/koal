@@ -71,7 +71,7 @@ func (i ItemDB) UpdateItem(ctx context.Context, Id string, updatedItem *tododoma
 	if err != nil {
 		return err
 	}
-	_, err = i.ItemClient.Update().Where(todoitem.UUID(itemUUID)).SetTitle(updatedItem.Title).SetIsDone(updatedItem.IsDone).Save(ctx)
+	_, err = i.ItemClient.Update().Where(todoitem.UUID(itemUUID)).SetTitle(updatedItem.Title).SetIsDone(updatedItem.IsDone).SetDescription(updatedItem.Description).Save(ctx)
 	if ent.IsNotFound(err) {
 		return fmt.Errorf("%w", NotFoundErr)
 	}
