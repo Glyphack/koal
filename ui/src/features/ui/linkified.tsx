@@ -15,6 +15,7 @@ export function Linkified({ children }: LinkifiedProps) {
 						href={word}
 						target="_blank"
 						rel="noreferrer"
+						onFocus={(event) => event.stopPropagation()}
 					>
 						{word}
 					</a>

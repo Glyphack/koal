@@ -41,11 +41,11 @@ export function TaskDescription({ task }: TaskDescriptionProps) {
 
 	const text = (
 		<p
-			className="whitespace-pre-line min-h-[4rem]"
+			className="mb-1 whitespace-pre-line"
 			onFocus={() => descriptionEditable.setIsEditing(true)}
 			tabIndex={0}
 		>
-			<Linkified>{newDescription}</Linkified>
+			{newDescription ? <Linkified>{newDescription}</Linkified> : <br />}
 		</p>
 	)
 
