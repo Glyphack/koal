@@ -29,15 +29,7 @@ function ProjectsLink() {
 	const isInInboxPage = useMatch('/inbox')
 	const showProjectsLink = isInProjectPage || isInInboxPage
 
-	return (
-		<div>
-			{showProjectsLink && (
-				<Link to="/project" withLeftIcon>
-					Projects
-				</Link>
-			)}
-		</div>
-	)
+	return <div>{showProjectsLink && <Link to="/project">Projects</Link>}</div>
 }
 
 function UserEmail() {

@@ -1,8 +1,9 @@
-import { useForm } from 'react-hook-form'
+import { Button, TextInput } from '@mantine/core'
+import { useForm } from '@mantine/form'
 import { useMutation } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../api'
-import { Button, ErrorMessage, Field, Form } from '../ui'
+import { ErrorMessage, Form } from '../ui'
 import { useAuth } from './use-auth'
 
 export function SignInForm() {
@@ -11,31 +12,31 @@ export function SignInForm() {
 		authenticate: state.authenticate,
 		triedToVisitPage: state.triedToVisitPage,
 	}))
-	const form = useForm({ defaultValues: { email: '', password: '' } })
+	const form = useForm({ initialValues: { email: '', password: '' } })
 	const signInMutation = useMutation(api.signIn, {
 		onSuccess: (data) => {
 			authenticate(data.data.token)
 			navigate(triedToVisitPage || '/project', { replace: true })
 		},
 	})
-	const signIn = form.handleSubmit((values) => signInMutation.mutate(values))
+	const signIn = form.onSubmit((values) => signInMutation.mutate(values))
 
 	return (
 		<Form
 			onSubmit={signIn}
 			fields={
 				<>
-					<Field
+					<TextInput
 						label="Email"
 						type="text"
 						placeholder="email@address.com"
-						{...form.register('email')}
+						{...form.getInputProps('email')}
 					/>
-					<Field
+					<TextInput
 						label="Password"
 						type="password"
 						placeholder="your password"
-						{...form.register('password')}
+						{...form.getInputProps('password')}
 					/>
 				</>
 			}

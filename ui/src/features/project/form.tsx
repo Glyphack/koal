@@ -1,28 +1,29 @@
-import { useForm } from 'react-hook-form'
+import { Button, TextInput } from '@mantine/core'
+import { useForm } from '@mantine/form'
 import { useMutation, useQueryClient } from 'react-query'
 import { api, QueryKey } from '../../api'
-import { Button, Field, Form } from '../ui'
+import { Form } from '../ui'
 
 export function ProjectForm() {
 	const queryClient = useQueryClient()
-	const form = useForm({ defaultValues: { name: '' } })
+	const form = useForm({ initialValues: { name: '' } })
 	const mutation = useMutation(api.createProject, {
 		onSuccess: () => {
-			queryClient.invalidateQueries(QueryKey.Projects)
+			queryClient.invalidateQueries([QueryKey.Projects])
 			form.reset()
 		},
 	})
-	const createProject = form.handleSubmit((values) => mutation.mutate(values))
+	const createProject = form.onSubmit((values) => mutation.mutate(values))
 
 	return (
 		<Form
 			onSubmit={createProject}
 			fields={
-				<Field
+				<TextInput
 					label="Project"
 					type="text"
 					placeholder="project name"
-					{...form.register('name')}
+					{...form.getInputProps('name')}
 				/>
 			}
 			actions={

@@ -1,8 +1,8 @@
+import { ActionIcon } from '@mantine/core'
 import { HiOutlineTrash } from 'react-icons/hi'
 import { useMutation } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../api'
-import { Button } from '../ui'
 
 interface ProjectDeletionProps {
 	projectId: string
@@ -16,14 +16,8 @@ export function ProjectDeletion({ projectId }: ProjectDeletionProps) {
 	const deleteProject = () => deleteProjectMutation.mutate(projectId)
 
 	return (
-		<Button
-			variant="icon"
-			type="button"
-			onClick={deleteProject}
-			loading={deleteProjectMutation.isLoading}
-			data-testid="project-deletion"
-		>
+		<ActionIcon onClick={deleteProject} loading={deleteProjectMutation.isLoading}>
 			<HiOutlineTrash />
-		</Button>
+		</ActionIcon>
 	)
 }

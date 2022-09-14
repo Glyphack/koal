@@ -1,8 +1,8 @@
-import clsx from 'clsx'
 import { Task } from '../../api'
-import { Linkified } from '../ui'
 import { TaskCompletion } from './completion'
 import { TaskDeletion } from './deletion'
+import { TaskDescription } from './description'
+import { TaskTitle } from './title'
 
 interface InboxTaskItemProps {
 	task: Task
@@ -10,17 +10,17 @@ interface InboxTaskItemProps {
 
 export function InboxTaskItem({ task }: InboxTaskItemProps) {
 	return (
-		<div className="flex items-center justify-between gap-10">
-			<div>
-				<h4
-					className={clsx(task.isDone && 'line-through text-gray-500')}
-					data-testid="task-title"
-				>
-					<Linkified>{task.title}</Linkified>
-				</h4>
-				<h5 className="text-xs text-gray-500">{task.project.name}</h5>
+		<div className="flex justify-between gap-10">
+			<div className="w-full">
+				<div className="flex items-center gap-2">
+					<TaskTitle task={task} />
+					<p className="px-2 py-0.5 text-xs text-gray-500 rounded-full bg-gray-50">
+						{task.project.name}
+					</p>
+				</div>
+				<TaskDescription task={task} />
 			</div>
-			<div className="flex items-center gap-6">
+			<div className="flex gap-2">
 				<TaskCompletion taskId={task.id} isDone={task.isDone} />
 				<TaskDeletion taskId={task.id} />
 			</div>
