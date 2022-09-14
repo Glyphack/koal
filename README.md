@@ -4,7 +4,7 @@ Koal is a personal goal management and time tracker software. It's approach to t
 
 ## Backend and Frontend code
 
-Both backens
+Both backends
 
 ## Backend Technical Documentation
 
