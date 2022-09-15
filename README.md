@@ -14,7 +14,7 @@ I followed a modular monolith design approach with Koal, it consists of services
 
 #### API
 
-Each service defines it's API in `/api` directory with Protobuf and implement the API servicer in their module, these definitions will create a REST API using grpc-gateway project.
+Each service defines it's API in `/api` directory with `Protobuf` and implement the API servicer in their module, these definitions will create a REST API using grpc-gateway project.
 
 The Gateway is created within the main component and services are given to it as an input.
 
