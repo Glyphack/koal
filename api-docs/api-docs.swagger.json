@@ -86,6 +86,53 @@
       }
     },
     "/v1/todo/items": {
+      "get": {
+        "summary": "return all queried todo items for a user",
+        "operationId": "TodoService_GetTodoItems",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetTodoItemsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "isDone",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "itemId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "projectIds",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TodoService"
+        ]
+      },
       "post": {
         "operationId": "TodoService_CreateTodoItem",
         "responses": {
@@ -489,6 +536,17 @@
         }
       }
     },
+    "v1GetTodoItemsResponse": {
+      "type": "object",
+      "properties": {
+        "todoItems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1TodoItem"
+          }
+        }
+      }
+    },
     "v1GetUndoneListResponse": {
       "type": "object",
       "properties": {
@@ -533,7 +591,8 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "readOnly": true
         },
         "name": {
           "type": "string"
@@ -573,7 +632,8 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "readOnly": true
         },
         "title": {
           "type": "string"

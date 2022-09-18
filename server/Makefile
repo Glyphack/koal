@@ -1,6 +1,4 @@
 gen-orm:
 	go generate ./ent
-gen-api:
-	buf generate
-	buf build
-
+gen-mocks:
+	moq -out mocks_test.go -rm internal/module/todo/infrastructure/ TodoRespository

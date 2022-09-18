@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/getsentry/sentry-go"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -70,6 +71,8 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 			} else {
 				hub.CaptureMessage(fmt.Sprintf("handler error is not compatible with status package: %s", err))
 			}
+			logrus.Error(err)
+			hub.CaptureException(err)
 		}
 		return resp, err
 	}

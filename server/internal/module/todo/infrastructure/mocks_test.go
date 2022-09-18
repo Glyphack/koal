@@ -40,6 +40,9 @@ var _ TodoRepository = &TodoRepositoryMock{}
 // 			GetItemByIdFunc: func(ctx context.Context, Id string) (*tododomain.TodoItem, error) {
 // 				panic("mock out the GetItemById method")
 // 			},
+// 			GetItemsFunc: func(ctx context.Context, itemQuery TodoItemQuery) (*[]tododomain.TodoItem, error) {
+// 				panic("mock out the GetItems method")
+// 			},
 // 			GetProjectFunc: func(ctx context.Context, ID string) (*tododomain.ProjectInfo, error) {
 // 				panic("mock out the GetProject method")
 // 			},
@@ -76,6 +79,9 @@ type TodoRepositoryMock struct {
 
 	// GetItemByIdFunc mocks the GetItemById method.
 	GetItemByIdFunc func(ctx context.Context, Id string) (*tododomain.TodoItem, error)
+
+	// GetItemsFunc mocks the GetItems method.
+	GetItemsFunc func(ctx context.Context, itemQuery TodoItemQuery) (*[]tododomain.TodoItem, error)
 
 	// GetProjectFunc mocks the GetProject method.
 	GetProjectFunc func(ctx context.Context, ID string) (*tododomain.ProjectInfo, error)
@@ -137,6 +143,13 @@ type TodoRepositoryMock struct {
 			// ID is the Id argument value.
 			ID string
 		}
+		// GetItems holds details about calls to the GetItems method.
+		GetItems []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ItemQuery is the itemQuery argument value.
+			ItemQuery TodoItemQuery
+		}
 		// GetProject holds details about calls to the GetProject method.
 		GetProject []struct {
 			// Ctx is the ctx argument value.
@@ -170,6 +183,7 @@ type TodoRepositoryMock struct {
 	lockDeleteProject        sync.RWMutex
 	lockGetAllMemberProjects sync.RWMutex
 	lockGetItemById          sync.RWMutex
+	lockGetItems             sync.RWMutex
 	lockGetProject           sync.RWMutex
 	lockUpdateItem           sync.RWMutex
 	lockUpdateProjectById    sync.RWMutex
@@ -417,6 +431,41 @@ func (mock *TodoRepositoryMock) GetItemByIdCalls() []struct {
 	mock.lockGetItemById.RLock()
 	calls = mock.calls.GetItemById
 	mock.lockGetItemById.RUnlock()
+	return calls
+}
+
+// GetItems calls GetItemsFunc.
+func (mock *TodoRepositoryMock) GetItems(ctx context.Context, itemQuery TodoItemQuery) (*[]tododomain.TodoItem, error) {
+	if mock.GetItemsFunc == nil {
+		panic("TodoRepositoryMock.GetItemsFunc: method is nil but TodoRepository.GetItems was just called")
+	}
+	callInfo := struct {
+		Ctx       context.Context
+		ItemQuery TodoItemQuery
+	}{
+		Ctx:       ctx,
+		ItemQuery: itemQuery,
+	}
+	mock.lockGetItems.Lock()
+	mock.calls.GetItems = append(mock.calls.GetItems, callInfo)
+	mock.lockGetItems.Unlock()
+	return mock.GetItemsFunc(ctx, itemQuery)
+}
+
+// GetItemsCalls gets all the calls that were made to GetItems.
+// Check the length with:
+//     len(mockedTodoRepository.GetItemsCalls())
+func (mock *TodoRepositoryMock) GetItemsCalls() []struct {
+	Ctx       context.Context
+	ItemQuery TodoItemQuery
+} {
+	var calls []struct {
+		Ctx       context.Context
+		ItemQuery TodoItemQuery
+	}
+	mock.lockGetItems.RLock()
+	calls = mock.calls.GetItems
+	mock.lockGetItems.RUnlock()
 	return calls
 }
 

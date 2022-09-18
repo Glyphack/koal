@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/glyphack/koal/ent"
+	"github.com/glyphack/koal/ent/predicate"
 	"github.com/glyphack/koal/ent/project"
 	"github.com/glyphack/koal/ent/todoitem"
 	tododomain "github.com/glyphack/koal/internal/module/todo/domain/todo"
@@ -118,6 +119,51 @@ func (i ItemDB) AllUndoneItems(
 		items = append(items, convertDbItemTypeToDomainItem(dbItem))
 	}
 	return items, nil
+}
+
+func (i ItemDB) GetItems(
+	ctx context.Context,
+	itemQuery TodoItemQuery,
+) (*[]tododomain.TodoItem, error) {
+	whereClause := []predicate.TodoItem{}
+	if itemQuery.Title != "" {
+		whereClause = append(whereClause, todoitem.TitleContainsFold(itemQuery.Title))
+	}
+	if itemQuery.UUId.String() != "" {
+		whereClause = append(whereClause, todoitem.UUID(itemQuery.UUId))
+	}
+	if itemQuery.IsDone == Done {
+		whereClause = append(whereClause, todoitem.IsDone(true))
+	}
+	if itemQuery.IsDone == NotDone {
+		whereClause = append(whereClause, todoitem.IsDone(false))
+	}
+	if len(itemQuery.ProjectIds) != 0 {
+		whereClause = append(
+			whereClause,
+			todoitem.HasProjectWith(project.UUIDIn(itemQuery.ProjectIds...)),
+		)
+	}
+	filteredItems, err := i.ItemClient.Query().Where(whereClause...).WithProject().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	result := []tododomain.TodoItem{}
+	for _, item := range filteredItems {
+		result = append(result, tododomain.TodoItem{
+			UUId:    item.UUID,
+			Title:   item.Title,
+			OwnerId: item.OwnerID,
+			Project: &tododomain.Project{
+				UUId:    item.Edges.Project.UUID,
+				Name:    item.Edges.Project.Name,
+				OwnerId: item.Edges.Project.OwnerID,
+			},
+			IsDone:      item.IsDone,
+			Description: item.Description,
+		})
+	}
+	return &result, nil
 }
 
 func (i ItemDB) CreateProject(ctx context.Context, project *tododomain.Project) error {

@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/glyphack/koal/ent"
 	todov1 "github.com/glyphack/koal/gen/proto/go/todo/v1"
 	tododomain "github.com/glyphack/koal/internal/module/todo/domain/todo"
 	todoinfra "github.com/glyphack/koal/internal/module/todo/infrastructure"
 	todousecase "github.com/glyphack/koal/internal/module/todo/usecase"
+	"github.com/glyphack/koal/pkg/grpcerrors"
 	"github.com/google/uuid"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
@@ -193,6 +195,73 @@ func (s server) GetUndoneList(
 		undoneItems = append(undoneItems, convertDomainItemToResponseItem(item))
 	}
 	return &todov1.GetUndoneListResponse{Items: undoneItems}, nil
+}
+
+func (s server) GetTodoItems(
+	ctx context.Context,
+	GetTodoItemsRequest *todov1.GetTodoItemsRequest,
+) (*todov1.GetTodoItemsResponse, error) {
+	itemQuery := todoinfra.TodoItemQuery{}
+	if GetTodoItemsRequest.ItemId != nil {
+		itemUUID, err := uuid.Parse(*GetTodoItemsRequest.ItemId)
+		if err != nil {
+			st, _ := grpcerrors.FieldValidationErorr(
+				"item_id",
+				"item_id must be in uuid format",
+				*GetTodoItemsRequest.ItemId,
+			)
+			return nil, st.Err()
+		}
+		itemQuery.UUId = itemUUID
+	}
+	if len(GetTodoItemsRequest.ProjectIds) > 0 {
+		idsToQuery := []uuid.UUID{}
+		for _, projectId := range strings.Split(GetTodoItemsRequest.ProjectIds, ",") {
+			projectUUID, err := uuid.Parse(projectId)
+			if err != nil {
+				st, _ := grpcerrors.FieldValidationErorr(
+					"project_ids",
+					"project_ids must be in uuid format",
+					string(projectId),
+				)
+				st.WithDetails(&errdetails.DebugInfo{
+					StackEntries: []string{
+						fmt.Sprintf("project id %v", projectId),
+						fmt.Sprintf("error, %v", err),
+					},
+					Detail: "uuid parsing stack trace",
+				})
+				return nil, st.Err()
+			}
+			idsToQuery = append(idsToQuery, projectUUID)
+		}
+		itemQuery.ProjectIds = idsToQuery
+	}
+	if GetTodoItemsRequest.IsDone != nil {
+		if *GetTodoItemsRequest.IsDone == true {
+			itemQuery.IsDone = todoinfra.Done
+		} else {
+			itemQuery.IsDone = todoinfra.NotDone
+		}
+	}
+	itemQuery.OwnerId = fmt.Sprint(ctx.Value("userId"))
+	todoItems, err := s.itemRepository.GetItems(ctx, itemQuery)
+	if err != nil {
+		st := status.New(codes.Internal, "Cannot retrieve items")
+		st, _ = st.WithDetails(&errdetails.DebugInfo{
+			StackEntries: []string{err.Error()},
+			Detail:       "",
+		})
+		return nil, st.Err()
+	}
+	responseItems := []*todov1.TodoItem{}
+	for _, item := range *todoItems {
+		responseItems = append(responseItems, convertDomainItemToResponseItem(&item))
+	}
+
+	return &todov1.GetTodoItemsResponse{
+		TodoItems: responseItems,
+	}, nil
 }
 
 func NewServer(dbConnection *ent.Client) *server {

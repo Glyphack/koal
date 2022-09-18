@@ -531,6 +531,89 @@ func (suite *Suite) Test_server_UpdateTodoItem() {
 	}
 }
 
+// func (suite *Suite) Test_server_GetItems() {
+// 	type args struct {
+// 		ctx context.Context
+// 		in1 *todov1.GetTodoItemsRequest
+// 	}
+// 	tests := []struct {
+// 		name    string
+// 		args    args
+// 		dbItems []*tododomain.TodoItem
+// 		want    *todov1.GetUndoneListResponse
+// 		wantErr bool
+// 	}{{
+// 		name: "Search by ProjectId",
+// 		args: args{
+// 			ctx: testutils.GetAuthenticatedContext(context.Background(), "user1"),
+// 			in1: &todov1.GetTodoItemsRequest{
+// 				IsDone:     nil,
+// 				ItemId:     nil,
+// 				ProjectIds: "",
+// 				Title:      nil,
+// 			},
+// 		},
+// 		dbItems: []*tododomain.TodoItem{{
+// 			UUId:    uuid.NewUUID(),
+// 			Title:   "item1",
+// 			OwnerId: "user1",
+// 			Project: &tododomain.Project{
+// 				UUId:    uuid.New(),
+// 				Name:    "projectWithItem",
+// 				OwnerId: "user1",
+// 			},
+// 			IsDone:      false,
+// 			Description: "test",
+// 		}},
+// 		want: &todov1.GetUndoneListResponse{
+// 			Items: []*todov1.TodoItem{
+// 				{
+// 					Id:     uuid.NewString(),
+// 					Title:  "item1",
+// 					IsDone: false,
+// 					Project: &todov1.Project{
+// 						Id:   uuid.NewString(),
+// 						Name: "projectWithItem",
+// 					},
+// 					Description: "test",
+// 				},
+// 			},
+// 		},
+// 		wantErr: false,
+// 	},
+// 	}
+// 	for _, tt := range tests {
+// 		suite.Run(tt.name, func() {
+// 			t := suite.T()
+// 			for _, item := range tt.items {
+// 				err := suite.TodoRepository.CreateProject(tt.args.ctx, item.Project)
+// 				if err != nil {
+// 					t.Fatal(err)
+// 				}
+// 				err = suite.TodoRepository.CreateItem(tt.args.ctx, item)
+// 				if err != nil {
+// 					t.Fatal(err)
+// 				}
+// 			}
+// 			s := todoapi.NewServer(suite.Client)
+// 			response, err := s.GetUndoneList(tt.args.ctx, tt.args.in1)
+
+// 			if tt.wantErr != false {
+// 				assert.NotNil(t, err)
+// 				return
+// 			}
+
+// 			assert.Nil(t, err)
+
+// 			assert.Len(t, response.Items, len(tt.want.Items))
+// 			for i, respItems := range response.Items {
+// 				assert.Equal(t, respItems.Title, tt.want.Items[i].Title)
+// 			}
+
+// 		})
+// 	}
+// }
+
 func (suite *Suite) Test_server_GetUndoneList() {
 	type args struct {
 		ctx context.Context

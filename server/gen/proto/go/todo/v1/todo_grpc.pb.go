@@ -35,6 +35,8 @@ type TodoServiceClient interface {
 	UpdateTodoItem(ctx context.Context, in *UpdateTodoItemRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// returns all the undone items across all projects
 	GetUndoneList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetUndoneListResponse, error)
+	// return all queried todo items for a user
+	GetTodoItems(ctx context.Context, in *GetTodoItemsRequest, opts ...grpc.CallOption) (*GetTodoItemsResponse, error)
 }
 
 type todoServiceClient struct {
@@ -126,6 +128,15 @@ func (c *todoServiceClient) GetUndoneList(ctx context.Context, in *emptypb.Empty
 	return out, nil
 }
 
+func (c *todoServiceClient) GetTodoItems(ctx context.Context, in *GetTodoItemsRequest, opts ...grpc.CallOption) (*GetTodoItemsResponse, error) {
+	out := new(GetTodoItemsResponse)
+	err := c.cc.Invoke(ctx, "/todo.v1.TodoService/GetTodoItems", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TodoServiceServer is the server API for TodoService service.
 // All implementations should embed UnimplementedTodoServiceServer
 // for forward compatibility
@@ -142,6 +153,8 @@ type TodoServiceServer interface {
 	UpdateTodoItem(context.Context, *UpdateTodoItemRequest) (*emptypb.Empty, error)
 	// returns all the undone items across all projects
 	GetUndoneList(context.Context, *emptypb.Empty) (*GetUndoneListResponse, error)
+	// return all queried todo items for a user
+	GetTodoItems(context.Context, *GetTodoItemsRequest) (*GetTodoItemsResponse, error)
 }
 
 // UnimplementedTodoServiceServer should be embedded to have forward compatible implementations.
@@ -174,6 +187,9 @@ func (UnimplementedTodoServiceServer) UpdateTodoItem(context.Context, *UpdateTod
 }
 func (UnimplementedTodoServiceServer) GetUndoneList(context.Context, *emptypb.Empty) (*GetUndoneListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUndoneList not implemented")
+}
+func (UnimplementedTodoServiceServer) GetTodoItems(context.Context, *GetTodoItemsRequest) (*GetTodoItemsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTodoItems not implemented")
 }
 
 // UnsafeTodoServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -349,6 +365,24 @@ func _TodoService_GetUndoneList_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TodoService_GetTodoItems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTodoItemsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TodoServiceServer).GetTodoItems(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/todo.v1.TodoService/GetTodoItems",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TodoServiceServer).GetTodoItems(ctx, req.(*GetTodoItemsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TodoService_ServiceDesc is the grpc.ServiceDesc for TodoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -391,6 +425,10 @@ var TodoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUndoneList",
 			Handler:    _TodoService_GetUndoneList_Handler,
+		},
+		{
+			MethodName: "GetTodoItems",
+			Handler:    _TodoService_GetTodoItems_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

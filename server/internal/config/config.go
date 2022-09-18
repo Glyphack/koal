@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -19,12 +20,13 @@ func InitConfig() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("env")
 	viper.AddConfigPath(".")
+	viper.AddConfigPath("..")
 
 	viper.AutomaticEnv()
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("Fatal error config file: %w \n", err))
+		log.Warningf("No config file found in paths: %v", err)
 	}
 
 	var config Config
