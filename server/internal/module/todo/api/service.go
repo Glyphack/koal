@@ -17,6 +17,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type server struct {
@@ -220,11 +222,11 @@ func (s server) GetTodoItems(
 			projectUUID, err := uuid.Parse(projectId)
 			if err != nil {
 				st, _ := grpcerrors.FieldValidationErorr(
-					"project_ids",
+					"project_id",
 					"project_ids must be in uuid format",
 					string(projectId),
 				)
-				st.WithDetails(&errdetails.DebugInfo{
+				st, _ = st.WithDetails(&errdetails.DebugInfo{
 					StackEntries: []string{
 						fmt.Sprintf("project id %v", projectId),
 						fmt.Sprintf("error, %v", err),
@@ -245,6 +247,7 @@ func (s server) GetTodoItems(
 		}
 	}
 	itemQuery.OwnerId = fmt.Sprint(ctx.Value("userId"))
+	log.Debugf("Querying todo items with %v", itemQuery)
 	todoItems, err := s.itemRepository.GetItems(ctx, itemQuery)
 	if err != nil {
 		st := status.New(codes.Internal, "Cannot retrieve items")

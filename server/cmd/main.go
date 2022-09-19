@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"net"
 	"net/http"
 	"time"
@@ -27,6 +26,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -34,6 +34,10 @@ import (
 
 func main() {
 	config.InitConfig()
+
+	if viper.GetBool("DEBUG") {
+		log.SetLevel(log.DebugLevel)
+	}
 	lis, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		log.Fatalln("Failed to listen:", err)
@@ -115,7 +119,7 @@ func newClient() *ent.Client {
 		if err != nil {
 			log.Fatal(err)
 		}
-		return client
+		return client.Debug()
 	} else {
 		client, err := ent.Open("postgres", viper.GetString("postgres_uri"))
 		if err != nil {

@@ -22,7 +22,7 @@ func FieldValidationErorr(
 		FieldViolations: []*errdetails.BadRequest_FieldViolation{v},
 	}
 	debugInfo := &errdetails.DebugInfo{
-		StackEntries: []string{fmt.Sprintf("raw value %s", fieldValue)},
+		StackEntries: []string{fmt.Sprintf("field raw value %s", fieldValue)},
 		Detail:       "",
 	}
 	st, err := st.WithDetails(badReq)

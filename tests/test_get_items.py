@@ -1,7 +1,10 @@
 import json
+
 import requests
 
-url = "http://localhost:8090/v1/auth/register"
+HOST = "http://localhost:8090/v1/"
+REGISTER = "auth/register"
+LOGIN = "auth/login"
 
 payload = '{\n  "email": "s@ss.com",\n  "password": "yahoo@yahoo"\n}'
 headers = {"Content-Type": "application/json"}
@@ -27,10 +30,10 @@ payload = {
     "title": "done-pj2",
     "description": "blahblah",
 }
-response = requests.request("POST", url, data=payload, headers=headers)
+response = requests.request("POST", url, json=payload, headers=headers)
 print(response.text)
 
-querystring = {f"projectIds": f"{project_id},"}
+querystring = {"projectIds": f"{project_id}"}
 payload = ""
 response = requests.request(
     "GET", url, data=payload, headers=headers, params=querystring

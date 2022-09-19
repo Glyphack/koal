@@ -129,7 +129,7 @@ func (i ItemDB) GetItems(
 	if itemQuery.Title != "" {
 		whereClause = append(whereClause, todoitem.TitleContainsFold(itemQuery.Title))
 	}
-	if itemQuery.UUId.String() != "" {
+	if itemQuery.UUId.String() != "00000000-0000-0000-0000-000000000000" {
 		whereClause = append(whereClause, todoitem.UUID(itemQuery.UUId))
 	}
 	if itemQuery.IsDone == Done {
